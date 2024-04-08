@@ -10,7 +10,7 @@
         box1_y : 0..4;
         box1_on_goal : boolean; 
         
-        walls : array 0..9 of array 0..9 of boolean; 
+        walls : array 0..10 of array 0..10 of boolean; 
     
         action : {up, down, left, right};  
 
@@ -19,7 +19,7 @@
         init(wk_x) := 2;
         init(wk_y) := 3;
         
-        init(box1_x) := 3;  
+        init(box1_x) := 2;  
         init(box1_y) := 2;
         init(box1_on_goal) := FALSE; 
         
@@ -32,6 +32,7 @@
             init(walls[0][6]) := TRUE;
             init(walls[0][7]) := TRUE;
             init(walls[0][8]) := TRUE;
+            init(walls[0][9]) := TRUE;
             init(walls[1][0]) := TRUE;
             init(walls[1][1]) := TRUE;
             init(walls[1][2]) := TRUE;
@@ -41,6 +42,7 @@
             init(walls[1][6]) := TRUE;
             init(walls[1][7]) := TRUE;
             init(walls[1][8]) := TRUE;
+            init(walls[1][9]) := TRUE;
             init(walls[2][0]) := TRUE;
             init(walls[2][1]) := TRUE;
             init(walls[2][2]) := FALSE;
@@ -48,17 +50,19 @@
             init(walls[2][4]) := FALSE;
             init(walls[2][5]) := FALSE;
             init(walls[2][6]) := FALSE;
-            init(walls[2][7]) := TRUE;
+            init(walls[2][7]) := FALSE;
             init(walls[2][8]) := TRUE;
+            init(walls[2][9]) := TRUE;
             init(walls[3][0]) := TRUE;
             init(walls[3][1]) := TRUE;
             init(walls[3][2]) := TRUE;
             init(walls[3][3]) := FALSE;
             init(walls[3][4]) := FALSE;
             init(walls[3][5]) := FALSE;
-            init(walls[3][6]) := TRUE;
+            init(walls[3][6]) := FALSE;
             init(walls[3][7]) := TRUE;
             init(walls[3][8]) := TRUE;
+            init(walls[3][9]) := TRUE;
             init(walls[4][0]) := TRUE;
             init(walls[4][1]) := TRUE;
             init(walls[4][2]) := TRUE;
@@ -86,8 +90,9 @@
             init(walls[6][4]) := FALSE;
             init(walls[6][5]) := FALSE;
             init(walls[6][6]) := FALSE;
-            init(walls[6][7]) := TRUE;
+            init(walls[6][7]) := FALSE;
             init(walls[6][8]) := TRUE;
+            init(walls[6][9]) := TRUE;
             init(walls[7][0]) := TRUE;
             init(walls[7][1]) := TRUE;
             init(walls[7][2]) := TRUE;
@@ -97,6 +102,7 @@
             init(walls[7][6]) := TRUE;
             init(walls[7][7]) := TRUE;
             init(walls[7][8]) := TRUE;
+            init(walls[7][9]) := TRUE;
             init(walls[8][0]) := TRUE;
             init(walls[8][1]) := TRUE;
             init(walls[8][2]) := TRUE;
@@ -106,12 +112,14 @@
             init(walls[8][6]) := TRUE;
             init(walls[8][7]) := TRUE;
             init(walls[8][8]) := TRUE;
+            init(walls[8][9]) := TRUE;
+     next(walls) := walls;  -- Walls do not change
      next(wk_x) := 
             case
                 wk_x = 0 : wk_x;  -- Cannot move left if at the left edge
                 wk_x = 5 : wk_x; -- Cannot move right if at the right edge
-                !walls[wk_x + 1][wk_y] : wk_x + 1;   -- Can move right if no wall to the right
-                !walls[wk_x - 1][wk_y] : wk_x - 1;  -- Can move left if no wall to the left
+                action = left & !walls[wk_x - 1][wk_y] : wk_x - 1;   -- Can move right if no wall to the right
+                action = right & !walls[wk_x + 1][wk_y] : wk_x + 1;  -- Can move left if no wall to the left
                 TRUE : wk_x;  -- Default: stay in the same position if no valid move
             esac;
 
@@ -119,8 +127,8 @@
             case
                 wk_y = 0 : wk_y;  -- Cannot move up if at the top edge
                 wk_y = 4 : wk_y; -- Cannot move down if at the bottom edge
-                !walls[wk_x][wk_y + 1] : wk_y + 1;  -- Can move down if no wall below
-                !walls[wk_x][wk_y - 1] : wk_y - 1;  -- Can move up if no wall above
+                action = up & !walls[wk_x][wk_y - 1] : wk_y - 1;  -- Can move down if no wall below
+                action = down & !walls[wk_x][wk_y + 1] : wk_y + 1;  -- Can move up if no wall above
                 TRUE : wk_y;   -- Default: stay in the same position if no valid move
             esac;
     
@@ -129,13 +137,8 @@
                  box1_x = 0 : box1_x;  -- Left edge
                  box1_x = 5 : box1_x;  -- Right edge
 
-                 -- Check for a push by the warehouse keeper:
-                 --wk_x = box1_x - 1 & wk_y = box1_y &
-                 !walls[box1_x + 1][box1_y] : box1_x + 1;  -- Space to push
-                 
-                 -- Check if box on goal:
-                 --box1_x = 2 & box1_y = 1 : box1_on_goal;
-                 
+                 action = left  & !walls[box1_x - 1][box1_y] & wk_x = box1_x + 1 & wk_y = box1_y : box1_x - 1;  -- Space to push
+                 action = right  & !walls[box1_x + 1][box1_y] & wk_x = box1_x - 1 & wk_y = box1_y : box1_x + 1;  -- Space to push
                  TRUE : box1_x;  -- Default: no movement
              esac;
 
@@ -143,41 +146,24 @@
              case
                  box1_y = 0 : box1_y;  -- Top edge
                  box1_y = 4 : box1_y;  -- Bottom edge 
-
-                 -- Check for a push by the warehouse keeper:
-                 --wk_y = box1_y - 1 & wk_x = box1_x &  
-                 !walls[box1_x][box1_y + 1] : box1_y + 1;  -- Space to push
                  
-                 -- Check if box on goal:
-                 --box1_x = 2 & box1_y = 1 : box1_on_goal;
-
+                 action = down  & !walls[box1_x][box1_y + 1] & wk_x = box1_x & wk_y = box1_y - 1 : box1_y + 1;  -- Space to push
+                 action = up  & !walls[box1_x][box1_y - 1] & wk_x = box1_x & wk_y = box1_y + 1 : box1_y - 1;  -- Space to push
                  TRUE : box1_y;  -- Default: no movement
              esac;
+             
+        next(box1_on_goal) :=
+        case
+            box1_x = 2 & box1_y = 1 : TRUE;  -- Check if box on goal
+            TRUE : FALSE;  -- Default: not on goal
+        esac;
         
 
-TRANS
-    next(action) = action;
-
-    case
-        action = 'up' & !walls[wk_x][wk_y + 1] :
-            next(wk_y) := wk_y + 1;
-            update_boxes('up');
-
-        action = 'down' & !walls[wk_x][wk_y - 1] :
-            next(wk_y) := wk_y - 1;
-            update_boxes('down');
-
-        action = 'left' & !walls[wk_x - 1][wk_y] :
-            next(wk_x) := wk_x - 1;
-            update_boxes('left');
-
-        action = 'right' & !walls[wk_x + 1][wk_y] :
-            next(wk_x) := wk_x + 1;
-            update_boxes('right');
-
-        TRUE : TRUE;  # Preserve state if no valid action
-    esac
+    TRANS
+       
+        next(action) = up | next(action) = down | next(action) = right | next(action) = left;  -- Non-deterministic choice of action
+ 
 
     LTLSPEC
-       F (box1_on_goal)
+       X (box1_on_goal)
     

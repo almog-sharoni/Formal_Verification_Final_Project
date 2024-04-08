@@ -130,12 +130,13 @@ def generate_smv_state(board_data):
 
     # Movement Constraints (Iterative)
     smv_state += f"""
+     next(walls) := walls;  -- Walls do not change
      next(wk_x) := 
             case
                 wk_x = 0 : wk_x;  -- Cannot move left if at the left edge
                 wk_x = {grid_width - 1} : wk_x; -- Cannot move right if at the right edge
-                !walls[wk_x + 1][wk_y] : wk_x + 1;   -- Can move right if no wall to the right
-                !walls[wk_x - 1][wk_y] : wk_x - 1;  -- Can move left if no wall to the left
+                action = left & !walls[wk_x - 1][wk_y] : wk_x - 1;   -- Can move right if no wall to the right
+                action = right & !walls[wk_x + 1][wk_y] : wk_x + 1;  -- Can move left if no wall to the left
                 TRUE : wk_x;  -- Default: stay in the same position if no valid move
             esac;
 
@@ -143,8 +144,8 @@ def generate_smv_state(board_data):
             case
                 wk_y = 0 : wk_y;  -- Cannot move up if at the top edge
                 wk_y = {grid_height - 1} : wk_y; -- Cannot move down if at the bottom edge
-                !walls[wk_x][wk_y + 1] : wk_y + 1;  -- Can move down if no wall below
-                !walls[wk_x][wk_y - 1] : wk_y - 1;  -- Can move up if no wall above
+                action = up & !walls[wk_x][wk_y - 1] : wk_y - 1;  -- Can move down if no wall below
+                action = down & !walls[wk_x][wk_y + 1] : wk_y + 1;  -- Can move up if no wall above
                 TRUE : wk_y;   -- Default: stay in the same position if no valid move
             esac;
     """
@@ -156,13 +157,8 @@ def generate_smv_state(board_data):
                  box{i + 1}_x = 0 : box{i + 1}_x;  -- Left edge
                  box{i + 1}_x = {grid_width - 1} : box{i + 1}_x;  -- Right edge
 
-                 -- Check for a push by the warehouse keeper:
-                 --wk_x = box{i + 1}_x - 1 & wk_y = box{i + 1}_y &
-                 !walls[box{i + 1}_x + 1][box{i + 1}_y] : box{i + 1}_x + 1;  -- Space to push
-                 
-                 -- Check if box on goal:
-                 --box{i + 1}_x = {board_data['goals'][i][0]} & box{i + 1}_y = {board_data['goals'][i][1]} : box{i + 1}_on_goal;
-                 
+                 action = left  & !walls[box{i + 1}_x - 1][box{i + 1}_y] & wk_x = box{i + 1}_x + 1 & wk_y = box{i + 1}_y : box{i + 1}_x - 1;  -- Space to push
+                 action = right  & !walls[box{i + 1}_x + 1][box{i + 1}_y] & wk_x = box{i + 1}_x - 1 & wk_y = box{i + 1}_y : box{i + 1}_x + 1;  -- Space to push
                  TRUE : box{i + 1}_x;  -- Default: no movement
              esac;
 
@@ -170,16 +166,17 @@ def generate_smv_state(board_data):
              case
                  box{i + 1}_y = 0 : box{i + 1}_y;  -- Top edge
                  box{i + 1}_y = {grid_height - 1} : box{i + 1}_y;  -- Bottom edge 
-
-                 -- Check for a push by the warehouse keeper:
-                 --wk_y = box{i + 1}_y - 1 & wk_x = box{i + 1}_x &  
-                 !walls[box{i + 1}_x][box{i + 1}_y + 1] : box{i + 1}_y + 1;  -- Space to push
                  
-                 -- Check if box on goal:
-                 --box{i + 1}_x = {board_data['goals'][i][0]} & box{i + 1}_y = {board_data['goals'][i][1]} : box{i + 1}_on_goal;
-
+                 action = down  & !walls[box{i + 1}_x][box{i + 1}_y + 1] & wk_x = box{i + 1}_x & wk_y = box{i + 1}_y - 1 : box{i + 1}_y + 1;  -- Space to push
+                 action = up  & !walls[box{i + 1}_x][box{i + 1}_y - 1] & wk_x = box{i + 1}_x & wk_y = box{i + 1}_y + 1 : box{i + 1}_y - 1;  -- Space to push
                  TRUE : box{i + 1}_y;  -- Default: no movement
              esac;
+             
+        next(box{i + 1}_on_goal) :=
+        case
+            box{i + 1}_x = {board_data['goals'][i][0]} & box{i + 1}_y = {board_data['goals'][i][1]} : TRUE;  -- Check if box on goal
+            TRUE : FALSE;  -- Default: not on goal
+        esac;
         """
     # TODO: should add more box movement constraints here (e.g., preventing two-box pushes and box-wall collisions)
 
@@ -206,54 +203,10 @@ def generate_smv_actions(board_data):
     grid_height = board_data['height']
 
     smv_actions = f"""
-        next(action) = action;  -- Non-deterministic choice of action
+        next(action) = up | next(action) = down | next(action) = right | next(action) = left;  -- Non-deterministic choice of action
 """
-    #     case
-    #         action = 'up' & !walls[wk_x][wk_y + 1] :
-    #             next(wk_y) := wk_y + 1;
-    #             {update_boxes('up', board_data, grid_width, grid_height)};  -- Trigger box movement logic
-    #
-    #         action = 'down' & !walls[wk_x][wk_y - 1] :
-    #             next(wk_y) := wk_y - 1;
-    #             {update_boxes('down', board_data, grid_width, grid_height)};
-    #
-    #         action = 'left' & !walls[wk_x - 1][wk_y] :
-    #             next(wk_x) := wk_x - 1;
-    #             {update_boxes('left', board_data, grid_width, grid_height)};
-    #
-    #         action = 'right' & !walls[wk_x + 1][wk_y] :
-    #             next(wk_x) := wk_x + 1;
-    #             {update_boxes('right', board_data, grid_width, grid_height)};
-    #
-    #         TRUE : TRUE;  -- Preserve state if no valid action
-    #     esac
-    # """
+
     return smv_actions
-
-
-def update_boxes(direction, board_data, grid_width, grid_height):
-    num_boxes = len(board_data['boxes'])
-    box_updates = ""
-    for i in range(num_boxes):
-        box_updates += f"""
-        case
-            box{i + 1}_x = wk_x & box{i + 1}_y = wk_y :  -- Warehouse keeper is pushing box {i + 1}
-                case
-                    action = 'up' & !walls[box{i + 1}_x][box{i + 1}_y + 1] : 
-                        next(box{i + 1}_y) := box{i + 1}_y + 1;
-                    action = 'down' & !walls[box{i + 1}_x][box{i + 1}_y - 1] : 
-                        next(box{i + 1}_y) := box{i + 1}_y - 1;
-                    action = 'left' & !walls[box{i + 1}_x - 1][box{i + 1}_y] : 
-                        next(box{i + 1}_x) := box{i + 1}_x - 1;
-                    action = 'right' & !walls[box{i + 1}_x + 1][box{i + 1}_y] : 
-                        next(box{i + 1}_x) := box{i + 1}_x + 1;
-                    TRUE : TRUE;  -- Preserve box position if no valid push
-                esac;
-            TRUE : TRUE;  -- Preserve box position if not pushed
-        esac;
-        """
-
-    return box_updates
 
 
 def generate_smv_win_spec(board_data):
@@ -266,17 +219,17 @@ def generate_smv_win_spec(board_data):
     box_on_goal_conditions = [f"box{i + 1}_on_goal" for i in range(num_boxes)]
     win_condition = " & ".join(box_on_goal_conditions)
 
-    smv_win_spec = f"F ({win_condition})"  # should consider AG instead of F
+    smv_win_spec = f"X ({win_condition})"  # should consider AG instead of F
     return smv_win_spec
 
 
 def main():
     xsb_board = """
------
-#-.-#
-#- $-#
+------
+#-.--#
+#-$--#
 #-@#-#
------
+------
 """  # Example board
 
     board_data = parse_board(xsb_board)
