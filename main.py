@@ -19,7 +19,7 @@ def parse_board(xsb_input):
     }
 
     lines = xsb_input.strip().splitlines()
-    board_data['width'] = max(len(line) for line in lines)
+    board_data['width'] = len(lines[0])
     board_data['height'] = len(lines)
     for y, line in enumerate(lines):
         for x, char in enumerate(line):
@@ -54,12 +54,12 @@ def parse_board(xsb_input):
             row.append("TRUE" if char in ['.', '*'] else "FALSE")
         goals_array.append(row)
 
-    boxes_array = []
-    for line in xsb_input.strip().splitlines():
-        row = []
-        for char in line:
-            row.append("TRUE" if char in ['$', '*'] else "FALSE")
-        boxes_array.append(row)
+    # boxes_array = []
+    # for line in xsb_input.strip().splitlines():
+    #     row = []
+    #     for char in line:
+    #         row.append("TRUE" if char in ['$', '*'] else "FALSE")
+    #     boxes_array.append(row)
 
     floor_array = []
     for line in xsb_input.strip().splitlines():
@@ -73,7 +73,7 @@ def parse_board(xsb_input):
     padded_walls = add_square_padding_lists(wall_array)
     board_data['walls'] = padded_walls
     board_data['goals'] = goals_array
-    board_data['boxes'] = boxes_array
+    # board_data['boxes'] = boxes_array
     board_data['floors'] = floor_array
 
     return board_data
@@ -129,20 +129,19 @@ def generate_smv_var(board_data):
     # keeper_y, wk_y = board_data['wk_pos']
 
     smv_var = f"""
-        columns : 
         keeper_x : 0..{grid_width - 1}; 
         keeper_y : 0..{grid_height - 1}; 
         """
 
-    # for i in range(num_boxes):
-    #     smv_var += f"""
-    #     box{i + 1}_x : 0..{grid_width - 1};
-    #     box{i + 1}_y : 0..{grid_height - 1};
-    #     box{i + 1}_on_goal : boolean;
-    #     """
+    for i in range(len(board_data['boxes'])):
+        smv_var += f"""
+            box{i + 1}_x : 0..{grid_width - 1};
+            box{i + 1}_y : 0..{grid_height - 1};
+            box{i + 1}_on_goal : boolean; 
+        """
+
 
     smv_var += f"""
-        boxes: array 0..{len(board_data['boxes'][0])} of array 0..{len(board_data['boxes'][1])} of boolean;
    
         walls : array 0..{len(board_data['walls'][0])} of array 0..{len(board_data['walls'][1])} of boolean; 
         
@@ -168,22 +167,21 @@ def generate_smv_state(board_data):
         init(keeper_y) := {keeper_y};
         init(action) := 0;
         """
+    for i in range(num_boxes):
+        smv_state += f"""
+            init(box{i + 1}_x) := {board_data['boxes'][i][0]};  
+            init(box{i + 1}_y) := {board_data['boxes'][i][1]};
+            init(box{i + 1}_on_goal) := {is_position_a_goal(board_data, board_data['boxes'][i][0], board_data['boxes'][i][1])}; 
+            """
 
-    for x in range(len(grid_width)):
-        for y in range(len(grid_height)):
+    for x in range(grid_width):
+        for y in range(grid_height):
+            print("index", x, y)
             smv_state += f"""
                 init(walls[{x}][{y}]) := {board_data['walls'][x][y]};
                 init(goals[{x}][{y}]) := {board_data['goals'][x][y]};
-                init(boxes[{x}][{y}]) := {board_data['boxes'][x][y]};
                 init(floors[{x}][{y}]) := {board_data['floors'][x][y]};
                 """
-
-    # for i in range(num_boxes):
-    #     smv_state += f"""
-    #     init(box{i + 1}_x) := {board_data['boxes'][i][0]};
-    #     init(box{i + 1}_y) := {board_data['boxes'][i][1]};
-    #     init(box{i + 1}_on_goal) := {is_position_a_goal(board_data, board_data['boxes'][i][0], board_data['boxes'][i][1])};
-    #     """
 
     # smv_state += initWalls(board_data['walls'])
 
@@ -191,68 +189,51 @@ def generate_smv_state(board_data):
     smv_state += f"""
     
     -- dont need to refer the borders as we have walls
-    next(command) := {{u, d, l, r, 0}};
+    next(action) := {{u, d, l, r, 0}};
   
     
     next(keeper_y) := case
             -- keeper_x = {grid_width - 1} : keeper_x; -- Cannot move right if at the right edge
-            ((next(command) = u) & (boxes[keeper_x][keeper_y-1] = 1 & (floors[keeper_x][keeper_y-2] = 1 | goals[keeper_x][keeper_y-2] = 1))) : keeper_y - 1;  -- Can move up if there is a box above
-            ((next(command) = u) & (floors[keeper_x][keeper_y-1] = 1 | goals[keeper_x][keeper_y-1] = 1)) : keeper_y - 1;  -- Can move up if there is floor or goal above
+            ((next(action) = u) & (boxes[keeper_x][keeper_y-1] = 1 & (floors[keeper_x][keeper_y-2] = 1 | goals[keeper_x][keeper_y-2] = 1))) : keeper_y - 1;  -- Can move up if there is a box above
+            ((next(action) = u) & (floors[keeper_x][keeper_y-1] = 1 | goals[keeper_x][keeper_y-1] = 1)) : keeper_y - 1;  -- Can move up if there is floor or goal above
                 
-            ((next(command) = d) & (boxes[keeper_x][keeper_y+1] = 1 & (floors[keeper_x][keeper_y+2] = 1 | goals[keeper_x][keeper_y+2] = 1))): keeper_y + 1;  -- Can move down if there is a box below
-            ((next(command) = d) & (floors[keeper_x][keeper_y+1] = 1 | goals[keeper_x][keeper_y+1] = 1)): keeper_y + 1;  -- Can move down if there is floor or goal below
+            ((next(action) = d) & (boxes[keeper_x][keeper_y+1] = 1 & (floors[keeper_x][keeper_y+2] = 1 | goals[keeper_x][keeper_y+2] = 1))): keeper_y + 1;  -- Can move down if there is a box below
+            ((next(action) = d) & (floors[keeper_x][keeper_y+1] = 1 | goals[keeper_x][keeper_y+1] = 1)): keeper_y + 1;  -- Can move down if there is floor or goal below
                 
             TRUE : keeper_y;  -- Default: stay in the same position if no valid move
     esac;
 
     next(keeper_x) :=  case
-            ((next(command) = l) & (boxes[keeper_x-1][keeper_y] = 1 & (floors[keeper_x-2][keeper_y] = 1 | goals[keeper_x-2][keeper_y] = 1))): keeper_x - 1;  -- Can move left if there is a box to the left
-            ((next(command) = l) & (floors[keeper_x-1][keeper_y] = 1 | goals[keeper_x-1][keeper_y] = 1)): keeper_x - 1;  -- Can move left if there is floor or goal to the left
+            ((next(action) = l) & (boxes[keeper_x-1][keeper_y] = 1 & (floors[keeper_x-2][keeper_y] = 1 | goals[keeper_x-2][keeper_y] = 1))): keeper_x - 1;  -- Can move left if there is a box to the left
+            ((next(action) = l) & (floors[keeper_x-1][keeper_y] = 1 | goals[keeper_x-1][keeper_y] = 1)): keeper_x - 1;  -- Can move left if there is floor or goal to the left
                 
-            ((next(command) = r) & (boxes[keeper_x+1][keeper_y] = 1 & (floors[keeper_x+2][keeper_y] = 1 | goals[keeper_x+2][keeper_y] = 1))): keeper_x + 1;  -- Can move right if there is a box to the right
-            ((next(command) = r) & (floors[keeper_x+1][keeper_y] = 1 | goals[keeper_x+1][keeper_y] = 1)): keeper_x + 1;  -- Can move right if there is floor or goal to the right
+            ((next(action) = r) & (boxes[keeper_x+1][keeper_y] = 1 & (floors[keeper_x+2][keeper_y] = 1 | goals[keeper_x+2][keeper_y] = 1))): keeper_x + 1;  -- Can move right if there is a box to the right
+            ((next(action) = r) & (floors[keeper_x+1][keeper_y] = 1 | goals[keeper_x+1][keeper_y] = 1)): keeper_x + 1;  -- Can move right if there is floor or goal to the right
             
             TRUE : keeper_x;  -- Default: stay in the same position if no valid move
     esac;
-    
-    -- check if next position of keeper is a box 
-    next(boxes) := case
-        (boxes[next(keeper_x)][next(keeper_y)] = 1) & (next(command) = u) : boxe
-    
     
     """
 
     for i in range(num_boxes):
         smv_state += f"""
-         next(box{i + 1}_x) := 
-             case
-                 box{i + 1}_x = 0 : box{i + 1}_x;  -- Left edge
-                 box{i + 1}_x = {grid_width - 1} : box{i + 1}_x;  -- Right edge
+         next(box{i + 1}_x) := case
+         
+                next(action) = l & (next(keeper_x) = box{i + 1}_x & next(keeper_y) = box{i + 1}_y) : box{i + 1}_x - 1;  -- Warehouse keeper is pushing box {i + 1}
+                next(action) = r & (next(keeper_x) = box{i + 1}_x & next(keeper_y) = box{i + 1}_y) : box{i + 1}_x + 1;  -- Warehouse keeper is pushing box {i + 1}
+                TRUE : box{i + 1}_x;  -- Default: no movement
+        esac;  
 
-                 -- Check for a push by the warehouse keeper:
-                 --wk_x = box{i + 1}_x - 1 & wk_y = box{i + 1}_y &
-                 !walls[box{i + 1}_x + 1][box{i + 1}_y] : box{i + 1}_x + 1;  -- Space to push
-                 
-                 -- Check if box on goal:
-                 --box{i + 1}_x = {board_data['goals'][i][0]} & box{i + 1}_y = {board_data['goals'][i][1]} : box{i + 1}_on_goal;
-                 
-                 TRUE : box{i + 1}_x;  -- Default: no movement
-             esac;
 
-         next(box{i + 1}_y) := 
-             case
-                 box{i + 1}_y = 0 : box{i + 1}_y;  -- Top edge
-                 box{i + 1}_y = {grid_height - 1} : box{i + 1}_y;  -- Bottom edge 
-
-                 -- Check for a push by the warehouse keeper:
-                 --wk_y = box{i + 1}_y - 1 & wk_x = box{i + 1}_x &  
-                 !walls[box{i + 1}_x][box{i + 1}_y + 1] : box{i + 1}_y + 1;  -- Space to push
-                 
-                 -- Check if box on goal:
-                 --box{i + 1}_x = {board_data['goals'][i][0]} & box{i + 1}_y = {board_data['goals'][i][1]} : box{i + 1}_on_goal;
-
-                 TRUE : box{i + 1}_y;  -- Default: no movement
-             esac;
+        next(box{i + 1}_y) := case
+                next(action) = d & (next(keeper_x) = box{i + 1}_x & next(keeper_y) = box{i + 1}_y) : box{i + 1}_y + 1;  -- Warehouse keeper is pushing box {i + 1}
+                next(action) = u & (next(keeper_x) = box{i + 1}_x & next(keeper_y) = box{i + 1}_y) : box{i + 1}_y - 1;  -- Warehouse keeper is pushing box {i + 1}
+                TRUE : box{i + 1}_y;  -- Default: no movement
+        esac;
+         
+        next(box{i + 1}_on_goal) := case
+            goals[next(box{i + 1}_x)][next(box{i + 1}_y)] = 'TRUE' : TRUE;
+            TRUE : FALSE;
         """
     # TODO: should add more box movement constraints here (e.g., preventing two-box pushes and box-wall collisions)
 
@@ -336,6 +317,8 @@ def generate_smv_win_spec(board_data):
         String containing the SMV specification
     """
     num_boxes = len(board_data['boxes'])
+    smv_ltlspec = ""
+
     box_on_goal_conditions = [f"box{i + 1}_on_goal" for i in range(num_boxes)]
     win_condition = " & ".join(box_on_goal_conditions)
 
@@ -362,8 +345,8 @@ def main():
             {generate_smv_var(board_data)}
            {generate_smv_state(board_data)}
     
-        TRANS
-           {generate_smv_actions(board_data)} 
+        --TRANS
+           # --{generate_smv_actions(board_data)} 
     
         LTLSPEC
            {generate_smv_win_spec(board_data)}
