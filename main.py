@@ -71,7 +71,7 @@ def parse_board(xsb_input):
     # board_data['walls'] = wall_array  # Add to the board_data dictionary
 
     padded_walls = add_square_padding_lists(wall_array)
-    board_data['walls'] = padded_walls
+    board_data['walls'] = wall_array
     paded_goals = add_square_padding_lists(goals_array,2,"FALSE")
     board_data['goals'] = goals_array
     # board_data['boxes'] = boxes_array
@@ -184,15 +184,8 @@ def generate_smv_state(board_data):
                 wk_x = 0 : wk_x;  -- Left edge
                 wk_x = {grid_width - 1} : wk_x;  -- Right edge
                
-                --action = left & !walls[wk_x - 1][wk_y] : wk_x - 1;   -- Can move right if no wall to the right
-                --action = right & !walls[wk_x + 1][wk_y] : wk_x + 1;  -- Can move left if no wall to the left
-                
-                --((action = left) & (boxes[wk_x - 1][wk_y]  & (floors[wk_x-2][wk_y]  | goals[wk_x-2][wk_y] ))): wk_x - 1;  -- Can move left if there is a box to the left
-                ((action = left) & (floors[wk_x - 1][wk_y]  | goals[wk_x - 1][wk_y] )): wk_x - 1;  -- Can move left if there is floor or goal to the left
-                
-                --((action = right) & (boxes[wk_x + 1][wk_y]  & (floors[wk_x+2][wk_y]  | goals[wk_x+2][wk_y] ))): wk_x + 1;  -- Can move right if there is a box to the right
-                ((action = right) & (floors[wk_x + 1][wk_y]  | goals[wk_x + 1][wk_y] )): wk_x + 1;  -- Can move right if there is floor or goal to the right
-            
+                action = left & !walls[wk_x - 1][wk_y] : wk_x - 1;   -- Can move right if no wall to the right
+                action = right & !walls[wk_x + 1][wk_y] : wk_x + 1;  -- Can move left if no wall to the left
                             
                 TRUE : wk_x;  -- Default: stay in the same position if no valid move
             esac;
@@ -200,17 +193,10 @@ def generate_smv_state(board_data):
         next(wk_y) :=  
             case
                 wk_y = 0 : wk_y;  -- Top edge
-                wk_y = {grid_height - 1} : wk_y;  -- Bottom edge              
-                --action = up & !walls[wk_x][wk_y - 1] : wk_y - 1;  -- Can move down if no wall below
-                --action = down & !walls[wk_x][wk_y + 1] : wk_y + 1;  -- Can move up if no wall above
-                
-                --((action = up) & (boxes[wk_x][wk_y - 1]  & (floors[wk_x][wk_y-2]  | goals[wk_x][wk_y-2] ))) : wk_y - 1;  -- Can move up if there is a box above
-                ((action = up) & (floors[wk_x][wk_y - 1]  | goals[wk_x][wk_y - 1] )) : wk_y - 1;  -- Can move up if there is floor or goal above
-            
-                --((action = down) & (boxes[wk_x][wk_y + 1]  & (floors[wk_x][wk_y+2]  | goals[wk_x][wk_y+2] ))): wk_y + 1;  -- Can move down if there is a box below
-                ((action = down) & (floors[wk_x][wk_y + 1]  | goals[wk_x][wk_y + 1] )): wk_y + 1;  -- Can move down if there is floor or goal below
-                
-               
+                wk_y = {grid_height - 1} : wk_y;  -- Bottom edge     
+                         
+                action = up & !walls[wk_x][wk_y - 1] : wk_y - 1;  -- Can move up if no wall below
+                action = down & !walls[wk_x][wk_y + 1] : wk_y + 1;  -- Can move down if no wall above
                 
                 TRUE : wk_y;   -- Default: stay in the same position if no valid move
             esac;
@@ -292,7 +278,7 @@ def generate_smv_win_spec(board_data):
     box_on_goal_conditions = [f"box{i + 1}_on_goal" for i in range(num_boxes)]
     win_condition = " & ".join(box_on_goal_conditions)
 
-    smv_win_spec = f"X ({win_condition})"  # should consider AG instead of F
+    smv_win_spec = f"AG (!{win_condition})"  # should consider AG instead of F
     return smv_win_spec
 
 
@@ -315,7 +301,7 @@ def main():
     TRANS
        {generate_smv_actions(board_data)} 
 
-    LTLSPEC
+    SPEC
        {generate_smv_win_spec(board_data)}
     """
 

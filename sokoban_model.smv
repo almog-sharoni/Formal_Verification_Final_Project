@@ -10,7 +10,7 @@
         box1_y : 0..4;
         box1_on_goal : boolean; 
         
-        walls : array 0..10 of array 0..10 of boolean; 
+        walls : array 0..6 of array 0..6 of boolean; 
         
         goals : array 0..6 of array 0..6 of boolean;
         
@@ -29,96 +29,36 @@
         init(box1_y) := 2;
         init(box1_on_goal) := FALSE; 
         
-            init(walls[0][0]) := TRUE;
-            init(walls[0][1]) := TRUE;
-            init(walls[0][2]) := TRUE;
-            init(walls[0][3]) := TRUE;
-            init(walls[0][4]) := TRUE;
-            init(walls[0][5]) := TRUE;
-            init(walls[0][6]) := TRUE;
-            init(walls[0][7]) := TRUE;
-            init(walls[0][8]) := TRUE;
-            init(walls[0][9]) := TRUE;
+            init(walls[0][0]) := FALSE;
+            init(walls[0][1]) := FALSE;
+            init(walls[0][2]) := FALSE;
+            init(walls[0][3]) := FALSE;
+            init(walls[0][4]) := FALSE;
+            init(walls[0][5]) := FALSE;
             init(walls[1][0]) := TRUE;
-            init(walls[1][1]) := TRUE;
-            init(walls[1][2]) := TRUE;
-            init(walls[1][3]) := TRUE;
-            init(walls[1][4]) := TRUE;
+            init(walls[1][1]) := FALSE;
+            init(walls[1][2]) := FALSE;
+            init(walls[1][3]) := FALSE;
+            init(walls[1][4]) := FALSE;
             init(walls[1][5]) := TRUE;
-            init(walls[1][6]) := TRUE;
-            init(walls[1][7]) := TRUE;
-            init(walls[1][8]) := TRUE;
-            init(walls[1][9]) := TRUE;
             init(walls[2][0]) := TRUE;
-            init(walls[2][1]) := TRUE;
+            init(walls[2][1]) := FALSE;
             init(walls[2][2]) := FALSE;
             init(walls[2][3]) := FALSE;
             init(walls[2][4]) := FALSE;
-            init(walls[2][5]) := FALSE;
-            init(walls[2][6]) := FALSE;
-            init(walls[2][7]) := FALSE;
-            init(walls[2][8]) := TRUE;
-            init(walls[2][9]) := TRUE;
+            init(walls[2][5]) := TRUE;
             init(walls[3][0]) := TRUE;
-            init(walls[3][1]) := TRUE;
-            init(walls[3][2]) := TRUE;
-            init(walls[3][3]) := FALSE;
+            init(walls[3][1]) := FALSE;
+            init(walls[3][2]) := FALSE;
+            init(walls[3][3]) := TRUE;
             init(walls[3][4]) := FALSE;
-            init(walls[3][5]) := FALSE;
-            init(walls[3][6]) := FALSE;
-            init(walls[3][7]) := TRUE;
-            init(walls[3][8]) := TRUE;
-            init(walls[3][9]) := TRUE;
-            init(walls[4][0]) := TRUE;
-            init(walls[4][1]) := TRUE;
-            init(walls[4][2]) := TRUE;
+            init(walls[3][5]) := TRUE;
+            init(walls[4][0]) := FALSE;
+            init(walls[4][1]) := FALSE;
+            init(walls[4][2]) := FALSE;
             init(walls[4][3]) := FALSE;
             init(walls[4][4]) := FALSE;
             init(walls[4][5]) := FALSE;
-            init(walls[4][6]) := FALSE;
-            init(walls[4][7]) := TRUE;
-            init(walls[4][8]) := TRUE;
-            init(walls[4][9]) := TRUE;
-            init(walls[5][0]) := TRUE;
-            init(walls[5][1]) := TRUE;
-            init(walls[5][2]) := TRUE;
-            init(walls[5][3]) := FALSE;
-            init(walls[5][4]) := FALSE;
-            init(walls[5][5]) := TRUE;
-            init(walls[5][6]) := FALSE;
-            init(walls[5][7]) := TRUE;
-            init(walls[5][8]) := TRUE;
-            init(walls[5][9]) := TRUE;
-            init(walls[6][0]) := TRUE;
-            init(walls[6][1]) := TRUE;
-            init(walls[6][2]) := FALSE;
-            init(walls[6][3]) := FALSE;
-            init(walls[6][4]) := FALSE;
-            init(walls[6][5]) := FALSE;
-            init(walls[6][6]) := FALSE;
-            init(walls[6][7]) := FALSE;
-            init(walls[6][8]) := TRUE;
-            init(walls[6][9]) := TRUE;
-            init(walls[7][0]) := TRUE;
-            init(walls[7][1]) := TRUE;
-            init(walls[7][2]) := TRUE;
-            init(walls[7][3]) := TRUE;
-            init(walls[7][4]) := TRUE;
-            init(walls[7][5]) := TRUE;
-            init(walls[7][6]) := TRUE;
-            init(walls[7][7]) := TRUE;
-            init(walls[7][8]) := TRUE;
-            init(walls[7][9]) := TRUE;
-            init(walls[8][0]) := TRUE;
-            init(walls[8][1]) := TRUE;
-            init(walls[8][2]) := TRUE;
-            init(walls[8][3]) := TRUE;
-            init(walls[8][4]) := TRUE;
-            init(walls[8][5]) := TRUE;
-            init(walls[8][6]) := TRUE;
-            init(walls[8][7]) := TRUE;
-            init(walls[8][8]) := TRUE;
-            init(walls[8][9]) := TRUE;
             init(goals[0][0]) := FALSE;
             init(goals[0][1]) := FALSE;
             init(goals[0][2]) := FALSE;
@@ -188,15 +128,8 @@
                 wk_x = 0 : wk_x;  -- Left edge
                 wk_x = 5 : wk_x;  -- Right edge
                
-                --action = left & !walls[wk_x - 1][wk_y] : wk_x - 1;   -- Can move right if no wall to the right
-                --action = right & !walls[wk_x + 1][wk_y] : wk_x + 1;  -- Can move left if no wall to the left
-                
-                --((action = left) & (boxes[wk_x - 1][wk_y]  & (floors[wk_x-2][wk_y]  | goals[wk_x-2][wk_y] ))): wk_x - 1;  -- Can move left if there is a box to the left
-                ((action = left) & (floors[wk_x - 1][wk_y]  | goals[wk_x - 1][wk_y] )): wk_x - 1;  -- Can move left if there is floor or goal to the left
-                
-                --((action = right) & (boxes[wk_x + 1][wk_y]  & (floors[wk_x+2][wk_y]  | goals[wk_x+2][wk_y] ))): wk_x + 1;  -- Can move right if there is a box to the right
-                ((action = right) & (floors[wk_x + 1][wk_y]  | goals[wk_x + 1][wk_y] )): wk_x + 1;  -- Can move right if there is floor or goal to the right
-            
+                action = left & !walls[wk_x - 1][wk_y] : wk_x - 1;   -- Can move right if no wall to the right
+                action = right & !walls[wk_x + 1][wk_y] : wk_x + 1;  -- Can move left if no wall to the left
                             
                 TRUE : wk_x;  -- Default: stay in the same position if no valid move
             esac;
@@ -204,17 +137,10 @@
         next(wk_y) :=  
             case
                 wk_y = 0 : wk_y;  -- Top edge
-                wk_y = 4 : wk_y;  -- Bottom edge              
-                --action = up & !walls[wk_x][wk_y - 1] : wk_y - 1;  -- Can move down if no wall below
-                --action = down & !walls[wk_x][wk_y + 1] : wk_y + 1;  -- Can move up if no wall above
-                
-                --((action = up) & (boxes[wk_x][wk_y - 1]  & (floors[wk_x][wk_y-2]  | goals[wk_x][wk_y-2] ))) : wk_y - 1;  -- Can move up if there is a box above
-                ((action = up) & (floors[wk_x][wk_y - 1]  | goals[wk_x][wk_y - 1] )) : wk_y - 1;  -- Can move up if there is floor or goal above
-            
-                --((action = down) & (boxes[wk_x][wk_y + 1]  & (floors[wk_x][wk_y+2]  | goals[wk_x][wk_y+2] ))): wk_y + 1;  -- Can move down if there is a box below
-                ((action = down) & (floors[wk_x][wk_y + 1]  | goals[wk_x][wk_y + 1] )): wk_y + 1;  -- Can move down if there is floor or goal below
-                
-               
+                wk_y = 4 : wk_y;  -- Bottom edge     
+                         
+                action = up & !walls[wk_x][wk_y - 1] : wk_y - 1;  -- Can move up if no wall below
+                action = down & !walls[wk_x][wk_y + 1] : wk_y + 1;  -- Can move down if no wall above
                 
                 TRUE : wk_y;   -- Default: stay in the same position if no valid move
             esac;
@@ -258,6 +184,6 @@
         next(action) = up | next(action) = down | next(action) = right | next(action) = left;  -- Non-deterministic choice of action
  
 
-    LTLSPEC
-       X (box1_on_goal)
+    SPEC
+       AG (!box1_on_goal)
     
