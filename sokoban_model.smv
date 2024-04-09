@@ -11,13 +11,19 @@
         box1_on_goal : boolean; 
         
         walls : array 0..10 of array 0..10 of boolean; 
+        
+        goals : array 0..6 of array 0..6 of boolean;
+        
+        floors : array 0..6 of array 0..6 of boolean;
+
     
-        action : {up, down, left, right};  
+        action : {up, down, left, right,0};  
 
     
     ASSIGN 
         init(wk_x) := 2;
         init(wk_y) := 3;
+        init(action) := 0;
         
         init(box1_x) := 2;  
         init(box1_y) := 2;
@@ -113,22 +119,103 @@
             init(walls[8][7]) := TRUE;
             init(walls[8][8]) := TRUE;
             init(walls[8][9]) := TRUE;
-     next(walls) := walls;  -- Walls do not change
+            init(goals[0][0]) := FALSE;
+            init(goals[0][1]) := FALSE;
+            init(goals[0][2]) := FALSE;
+            init(goals[0][3]) := FALSE;
+            init(goals[0][4]) := FALSE;
+            init(goals[0][5]) := FALSE;
+            init(goals[1][0]) := FALSE;
+            init(goals[1][1]) := FALSE;
+            init(goals[1][2]) := TRUE;
+            init(goals[1][3]) := FALSE;
+            init(goals[1][4]) := FALSE;
+            init(goals[1][5]) := FALSE;
+            init(goals[2][0]) := FALSE;
+            init(goals[2][1]) := FALSE;
+            init(goals[2][2]) := FALSE;
+            init(goals[2][3]) := FALSE;
+            init(goals[2][4]) := FALSE;
+            init(goals[2][5]) := FALSE;
+            init(goals[3][0]) := FALSE;
+            init(goals[3][1]) := FALSE;
+            init(goals[3][2]) := FALSE;
+            init(goals[3][3]) := FALSE;
+            init(goals[3][4]) := FALSE;
+            init(goals[3][5]) := FALSE;
+            init(goals[4][0]) := FALSE;
+            init(goals[4][1]) := FALSE;
+            init(goals[4][2]) := FALSE;
+            init(goals[4][3]) := FALSE;
+            init(goals[4][4]) := FALSE;
+            init(goals[4][5]) := FALSE;
+            init(floors[0][0]) := TRUE;
+            init(floors[0][1]) := TRUE;
+            init(floors[0][2]) := TRUE;
+            init(floors[0][3]) := TRUE;
+            init(floors[0][4]) := TRUE;
+            init(floors[0][5]) := TRUE;
+            init(floors[1][0]) := FALSE;
+            init(floors[1][1]) := TRUE;
+            init(floors[1][2]) := FALSE;
+            init(floors[1][3]) := TRUE;
+            init(floors[1][4]) := TRUE;
+            init(floors[1][5]) := FALSE;
+            init(floors[2][0]) := FALSE;
+            init(floors[2][1]) := TRUE;
+            init(floors[2][2]) := FALSE;
+            init(floors[2][3]) := TRUE;
+            init(floors[2][4]) := TRUE;
+            init(floors[2][5]) := FALSE;
+            init(floors[3][0]) := FALSE;
+            init(floors[3][1]) := TRUE;
+            init(floors[3][2]) := FALSE;
+            init(floors[3][3]) := FALSE;
+            init(floors[3][4]) := TRUE;
+            init(floors[3][5]) := FALSE;
+            init(floors[4][0]) := TRUE;
+            init(floors[4][1]) := TRUE;
+            init(floors[4][2]) := TRUE;
+            init(floors[4][3]) := TRUE;
+            init(floors[4][4]) := TRUE;
+            init(floors[4][5]) := TRUE;
+    next(walls) := walls;  -- Walls do not change
+    next(goals) := goals;  -- Goals do not change
+    next(floors) := floors;  -- Floors do not change
+     
      next(wk_x) := 
             case
-                wk_x = 0 : wk_x;  -- Cannot move left if at the left edge
-                wk_x = 5 : wk_x; -- Cannot move right if at the right edge
-                action = left & !walls[wk_x - 1][wk_y] : wk_x - 1;   -- Can move right if no wall to the right
-                action = right & !walls[wk_x + 1][wk_y] : wk_x + 1;  -- Can move left if no wall to the left
+                wk_x = 0 : wk_x;  -- Left edge
+                wk_x = 5 : wk_x;  -- Right edge
+               
+                --action = left & !walls[wk_x - 1][wk_y] : wk_x - 1;   -- Can move right if no wall to the right
+                --action = right & !walls[wk_x + 1][wk_y] : wk_x + 1;  -- Can move left if no wall to the left
+                
+                --((action = left) & (boxes[wk_x - 1][wk_y]  & (floors[wk_x-2][wk_y]  | goals[wk_x-2][wk_y] ))): wk_x - 1;  -- Can move left if there is a box to the left
+                ((action = left) & (floors[wk_x - 1][wk_y]  | goals[wk_x - 1][wk_y] )): wk_x - 1;  -- Can move left if there is floor or goal to the left
+                
+                --((action = right) & (boxes[wk_x + 1][wk_y]  & (floors[wk_x+2][wk_y]  | goals[wk_x+2][wk_y] ))): wk_x + 1;  -- Can move right if there is a box to the right
+                ((action = right) & (floors[wk_x + 1][wk_y]  | goals[wk_x + 1][wk_y] )): wk_x + 1;  -- Can move right if there is floor or goal to the right
+            
+                            
                 TRUE : wk_x;  -- Default: stay in the same position if no valid move
             esac;
 
         next(wk_y) :=  
             case
-                wk_y = 0 : wk_y;  -- Cannot move up if at the top edge
-                wk_y = 4 : wk_y; -- Cannot move down if at the bottom edge
-                action = up & !walls[wk_x][wk_y - 1] : wk_y - 1;  -- Can move down if no wall below
-                action = down & !walls[wk_x][wk_y + 1] : wk_y + 1;  -- Can move up if no wall above
+                wk_y = 0 : wk_y;  -- Top edge
+                wk_y = 4 : wk_y;  -- Bottom edge              
+                --action = up & !walls[wk_x][wk_y - 1] : wk_y - 1;  -- Can move down if no wall below
+                --action = down & !walls[wk_x][wk_y + 1] : wk_y + 1;  -- Can move up if no wall above
+                
+                --((action = up) & (boxes[wk_x][wk_y - 1]  & (floors[wk_x][wk_y-2]  | goals[wk_x][wk_y-2] ))) : wk_y - 1;  -- Can move up if there is a box above
+                ((action = up) & (floors[wk_x][wk_y - 1]  | goals[wk_x][wk_y - 1] )) : wk_y - 1;  -- Can move up if there is floor or goal above
+            
+                --((action = down) & (boxes[wk_x][wk_y + 1]  & (floors[wk_x][wk_y+2]  | goals[wk_x][wk_y+2] ))): wk_y + 1;  -- Can move down if there is a box below
+                ((action = down) & (floors[wk_x][wk_y + 1]  | goals[wk_x][wk_y + 1] )): wk_y + 1;  -- Can move down if there is floor or goal below
+                
+               
+                
                 TRUE : wk_y;   -- Default: stay in the same position if no valid move
             esac;
     
@@ -137,8 +224,11 @@
                  box1_x = 0 : box1_x;  -- Left edge
                  box1_x = 5 : box1_x;  -- Right edge
 
-                 action = left  & !walls[box1_x - 1][box1_y] & wk_x = box1_x + 1 & wk_y = box1_y : box1_x - 1;  -- Space to push
-                 action = right  & !walls[box1_x + 1][box1_y] & wk_x = box1_x - 1 & wk_y = box1_y : box1_x + 1;  -- Space to push
+                 --action = left  & !walls[box1_x - 1][box1_y] & wk_x = box1_x + 1 & wk_y = box1_y : box1_x - 1;  -- Space to push
+                 --action = right  & !walls[box1_x + 1][box1_y] & wk_x = box1_x - 1 & wk_y = box1_y : box1_x + 1;  -- Space to push
+                 
+                action = left & (next(wk_x) = box1_x & next(wk_y) = box1_y) : box1_x - 1;  -- Warehouse keeper is pushing box 1
+                action = right & (next(wk_x) = box1_x & next(wk_y) = box1_y) : box1_x + 1;  -- Warehouse keeper is pushing box 1
                  TRUE : box1_x;  -- Default: no movement
              esac;
 
@@ -147,14 +237,18 @@
                  box1_y = 0 : box1_y;  -- Top edge
                  box1_y = 4 : box1_y;  -- Bottom edge 
                  
-                 action = down  & !walls[box1_x][box1_y + 1] & wk_x = box1_x & wk_y = box1_y - 1 : box1_y + 1;  -- Space to push
-                 action = up  & !walls[box1_x][box1_y - 1] & wk_x = box1_x & wk_y = box1_y + 1 : box1_y - 1;  -- Space to push
+                 --action = down  & !walls[box1_x][box1_y + 1] & wk_x = box1_x & wk_y = box1_y - 1 : box1_y + 1;  -- Space to push
+                 --action = up  & !walls[box1_x][box1_y - 1] & wk_x = box1_x & wk_y = box1_y + 1 : box1_y - 1;  -- Space to push
+                 
+                action = down & (next(wk_x) = box1_x & next(wk_y) = box1_y) : box1_y + 1;  -- Warehouse keeper is pushing box 1
+                action = up & (next(wk_x) = box1_x & next(wk_y) = box1_y) : box1_y - 1;  -- Warehouse keeper is pushing box 1
+                
                  TRUE : box1_y;  -- Default: no movement
              esac;
              
         next(box1_on_goal) :=
         case
-            box1_x = 2 & box1_y = 1 : TRUE;  -- Check if box on goal
+            goals[next(box1_x)][next(box1_y)] : TRUE;
             TRUE : FALSE;  -- Default: not on goal
         esac;
         
