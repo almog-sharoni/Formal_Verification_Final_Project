@@ -2,188 +2,1076 @@
     MODULE main 
     VAR
        
-    
-        wk_x : 0..5; 
-        wk_y : 0..4; 
+        board : array 0..rows-1 of array 0..columns-1 of {'@', '$', '.', '+', '#', '-', '*'}; 
         
-        box1_x : 0..5;
-        box1_y : 0..4;
-        box1_on_goal : boolean; 
-        
-        walls : array 0..6 of array 0..6 of boolean; 
-        
-        goals : array 0..6 of array 0..6 of boolean;
-        
-        floors : array 0..6 of array 0..6 of boolean;
+        keeper_x : 0..rows-1;
+        keeper_y : 0..columns-1;
+
+        action : {u, d, l, r, 0};  
 
     
-        action : {up, down, left, right,0};  
 
-    
-    ASSIGN 
-        init(wk_x) := 2;
-        init(wk_y) := 3;
-        init(action) := 0;
+    ASSIGN
         
-        init(box1_x) := 2;  
-        init(box1_y) := 2;
-        init(box1_on_goal) := FALSE; 
-        
-            init(walls[0][0]) := FALSE;
-            init(walls[0][1]) := FALSE;
-            init(walls[0][2]) := FALSE;
-            init(walls[0][3]) := FALSE;
-            init(walls[0][4]) := FALSE;
-            init(walls[0][5]) := FALSE;
-            init(walls[1][0]) := TRUE;
-            init(walls[1][1]) := FALSE;
-            init(walls[1][2]) := FALSE;
-            init(walls[1][3]) := FALSE;
-            init(walls[1][4]) := FALSE;
-            init(walls[1][5]) := TRUE;
-            init(walls[2][0]) := TRUE;
-            init(walls[2][1]) := FALSE;
-            init(walls[2][2]) := FALSE;
-            init(walls[2][3]) := FALSE;
-            init(walls[2][4]) := FALSE;
-            init(walls[2][5]) := TRUE;
-            init(walls[3][0]) := TRUE;
-            init(walls[3][1]) := FALSE;
-            init(walls[3][2]) := FALSE;
-            init(walls[3][3]) := TRUE;
-            init(walls[3][4]) := FALSE;
-            init(walls[3][5]) := TRUE;
-            init(walls[4][0]) := FALSE;
-            init(walls[4][1]) := FALSE;
-            init(walls[4][2]) := FALSE;
-            init(walls[4][3]) := FALSE;
-            init(walls[4][4]) := FALSE;
-            init(walls[4][5]) := FALSE;
-            init(goals[0][0]) := FALSE;
-            init(goals[0][1]) := FALSE;
-            init(goals[0][2]) := FALSE;
-            init(goals[0][3]) := FALSE;
-            init(goals[0][4]) := FALSE;
-            init(goals[0][5]) := FALSE;
-            init(goals[1][0]) := FALSE;
-            init(goals[1][1]) := FALSE;
-            init(goals[1][2]) := TRUE;
-            init(goals[1][3]) := FALSE;
-            init(goals[1][4]) := FALSE;
-            init(goals[1][5]) := FALSE;
-            init(goals[2][0]) := FALSE;
-            init(goals[2][1]) := FALSE;
-            init(goals[2][2]) := FALSE;
-            init(goals[2][3]) := FALSE;
-            init(goals[2][4]) := FALSE;
-            init(goals[2][5]) := FALSE;
-            init(goals[3][0]) := FALSE;
-            init(goals[3][1]) := FALSE;
-            init(goals[3][2]) := FALSE;
-            init(goals[3][3]) := FALSE;
-            init(goals[3][4]) := FALSE;
-            init(goals[3][5]) := FALSE;
-            init(goals[4][0]) := FALSE;
-            init(goals[4][1]) := FALSE;
-            init(goals[4][2]) := FALSE;
-            init(goals[4][3]) := FALSE;
-            init(goals[4][4]) := FALSE;
-            init(goals[4][5]) := FALSE;
-            init(floors[0][0]) := TRUE;
-            init(floors[0][1]) := TRUE;
-            init(floors[0][2]) := TRUE;
-            init(floors[0][3]) := TRUE;
-            init(floors[0][4]) := TRUE;
-            init(floors[0][5]) := TRUE;
-            init(floors[1][0]) := FALSE;
-            init(floors[1][1]) := TRUE;
-            init(floors[1][2]) := FALSE;
-            init(floors[1][3]) := TRUE;
-            init(floors[1][4]) := TRUE;
-            init(floors[1][5]) := FALSE;
-            init(floors[2][0]) := FALSE;
-            init(floors[2][1]) := TRUE;
-            init(floors[2][2]) := FALSE;
-            init(floors[2][3]) := TRUE;
-            init(floors[2][4]) := TRUE;
-            init(floors[2][5]) := FALSE;
-            init(floors[3][0]) := FALSE;
-            init(floors[3][1]) := TRUE;
-            init(floors[3][2]) := FALSE;
-            init(floors[3][3]) := FALSE;
-            init(floors[3][4]) := TRUE;
-            init(floors[3][5]) := FALSE;
-            init(floors[4][0]) := TRUE;
-            init(floors[4][1]) := TRUE;
-            init(floors[4][2]) := TRUE;
-            init(floors[4][3]) := TRUE;
-            init(floors[4][4]) := TRUE;
-            init(floors[4][5]) := TRUE;
-    next(walls) := walls;  -- Walls do not change
-    next(goals) := goals;  -- Goals do not change
-    next(floors) := floors;  -- Floors do not change
-     
-     next(wk_x) := 
-            case
-                wk_x = 0 : wk_x;  -- Left edge
-                wk_x = 5 : wk_x;  -- Right edge
-               
-                action = left & !walls[wk_x - 1][wk_y] : wk_x - 1;   -- Can move right if no wall to the right
-                action = right & !walls[wk_x + 1][wk_y] : wk_x + 1;  -- Can move left if no wall to the left
-                            
-                TRUE : wk_x;  -- Default: stay in the same position if no valid move
-            esac;
-
-        next(wk_y) :=  
-            case
-                wk_y = 0 : wk_y;  -- Top edge
-                wk_y = 4 : wk_y;  -- Bottom edge     
-                         
-                action = up & !walls[wk_x][wk_y - 1] : wk_y - 1;  -- Can move up if no wall below
-                action = down & !walls[wk_x][wk_y + 1] : wk_y + 1;  -- Can move down if no wall above
-                
-                TRUE : wk_y;   -- Default: stay in the same position if no valid move
-            esac;
+            init(action) := 0;
+            init(keeper_x) := #-@#-#;
+            init(keeper_y) := 2;
+            
+            
+                        init(board[0][0]) := -;
+                    
+                        init(board[0][1]) := -;
+                    
+                        init(board[0][2]) := -;
+                    
+                        init(board[0][3]) := -;
+                    
+                        init(board[0][4]) := -;
+                    
+                        init(board[0][5]) := -;
+                    
+                        init(board[1][0]) := #;
+                    
+                        init(board[1][1]) := -;
+                    
+                        init(board[1][2]) := .;
+                    
+                        init(board[1][3]) := -;
+                    
+                        init(board[1][4]) := -;
+                    
+                        init(board[1][5]) := #;
+                    
+                        init(board[2][0]) := #;
+                    
+                        init(board[2][1]) := -;
+                    
+                        init(board[2][2]) := $;
+                    
+                        init(board[2][3]) := -;
+                    
+                        init(board[2][4]) := -;
+                    
+                        init(board[2][5]) := #;
+                    
+                        init(board[3][0]) := #;
+                    
+                        init(board[3][1]) := -;
+                    
+                        init(board[3][2]) := @;
+                    
+                        init(board[3][3]) := #;
+                    
+                        init(board[3][4]) := -;
+                    
+                        init(board[3][5]) := #;
+                    
+                        init(board[4][0]) := -;
+                    
+                        init(board[4][1]) := -;
+                    
+                        init(board[4][2]) := -;
+                    
+                        init(board[4][3]) := -;
+                    
+                        init(board[4][4]) := -;
+                    
+                        init(board[4][5]) := -;
+                    
     
-         next(box1_x) := 
-             case
-                 box1_x = 0 : box1_x;  -- Left edge
-                 box1_x = 5 : box1_x;  -- Right edge
-
-                 --action = left  & !walls[box1_x - 1][box1_y] & wk_x = box1_x + 1 & wk_y = box1_y : box1_x - 1;  -- Space to push
-                 --action = right  & !walls[box1_x + 1][box1_y] & wk_x = box1_x - 1 & wk_y = box1_y : box1_x + 1;  -- Space to push
-                 
-                action = left & (next(wk_x) = box1_x & next(wk_y) = box1_y) : box1_x - 1;  -- Warehouse keeper is pushing box 1
-                action = right & (next(wk_x) = box1_x & next(wk_y) = box1_y) : box1_x + 1;  -- Warehouse keeper is pushing box 1
-                 TRUE : box1_x;  -- Default: no movement
-             esac;
-
-         next(box1_y) := 
-             case
-                 box1_y = 0 : box1_y;  -- Top edge
-                 box1_y = 4 : box1_y;  -- Bottom edge 
-                 
-                 --action = down  & !walls[box1_x][box1_y + 1] & wk_x = box1_x & wk_y = box1_y - 1 : box1_y + 1;  -- Space to push
-                 --action = up  & !walls[box1_x][box1_y - 1] & wk_x = box1_x & wk_y = box1_y + 1 : box1_y - 1;  -- Space to push
-                 
-                action = down & (next(wk_x) = box1_x & next(wk_y) = box1_y) : box1_y + 1;  -- Warehouse keeper is pushing box 1
-                action = up & (next(wk_x) = box1_x & next(wk_y) = box1_y) : box1_y - 1;  -- Warehouse keeper is pushing box 1
-                
-                 TRUE : box1_y;  -- Default: no movement
-             esac;
-             
-        next(box1_on_goal) :=
-        case
-            goals[next(box1_x)][next(box1_y)] : TRUE;
-            TRUE : FALSE;  -- Default: not on goal
+        -- dont need to refer the borders as we have walls
+        next(action) := {u, d, l, r, 0};
+    
+    
+        next(keeper_x) := case
+                -- keeper_x = columns - 1 : keeper_x; -- Cannot move right if at the right edge
+                (next(action) = u) & (board[keeper_x-1][keeper_y] = ('$', '*')) & (board[keeper_x-2][keeper_y] = ('-', '.')) : keeper_x - 1;  -- Can move up if there is a box above
+                (next(action) = u) & (board[keeper_x-1][keeper_y] = ('-', '.')) : keeper_x - 1;  -- Can move up if there is floor or goal above
+    
+                (next(action) = d) & (board[keeper_x+1][keeper_y] = ('$', '*')) & (board[keeper_x+2][keeper_y] = ('-', '.')): keeper_x + 1;  -- Can move down if there is a box below
+                (next(action) = d) & (board[keeper_x+1][keeper_y] = ('-', '.')): keeper_x + 1;  -- Can move down if there is floor or goal below
+    
+                TRUE : keeper_x;  -- Default: stay in the same position if no valid move
         esac;
+    
+        next(keeper_y) :=  case
+                (next(action) = l) & (board[keeper_x][keeper_y-1] = ('$', '*')) & (board[keeper_x][keeper_y-2] = ('-', '.')): keeper_y - 1;  -- Can move left if there is a box to the left
+                (next(action) = l) & (board[keeper_x][keeper_y-1] = ('-', '.')): keeper_y - 1;  -- Can move left if there is floor or goal to the left
+    
+                (next(action) = r) & (board[keeper_x][keeper_y+1] = ('$', '*')) & (board[keeper_x][keeper_y+2] = ('-', '.')) : keeper_y + 1;  -- Can move right if there is a box to the right
+                (next(action) = r) & (floors[keeper_x][keeper_y+1] = ('-', '.')): keeper_y + 1;  -- Can move right if there is floor or goal to the right
+    
+                TRUE : keeper_y;  -- Default: stay in the same position if no valid move
+        esac;
+    
         
-
-    TRANS
-       
-        next(action) = up | next(action) = down | next(action) = right | next(action) = left;  -- Non-deterministic choice of action
- 
+                next(board[0][0]) := case
+                    next(keeper_x) = 0 & next(keeper_y) = 0 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[0][0] = '+' & next(keeper_x) !=0 | next(keeper_y) != 0 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[0][0] = '@' & next(keeper_x) !=0 | next(keeper_y) != 0 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 0 & next(keeper_y) = 0 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[0][0] = '-' & (board[2][0] = ('@', '+')) & board[1][0] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[0][0] = '.' & (board[2][0] = ('@', '+')) & board[1][0] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[0][0] = '-' & (board[-2][0] = ('@', '+')) & board[-1][0] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[0][0] = '.' & (board[-2][0] = ('@', '+')) & board[-1][0] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[0][0] = '-' & (board[0][2] = ('@', '+')) & board[0][1] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[0][0] = '.' & (board[0][2] = ('@', '+')) & board[0][1] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[0][1]) := case
+                    next(keeper_x) = 0 & next(keeper_y) = 1 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[0][1] = '+' & next(keeper_x) !=0 | next(keeper_y) != 1 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[0][1] = '@' & next(keeper_x) !=0 | next(keeper_y) != 1 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 0 & next(keeper_y) = 1 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[0][1] = '-' & (board[2][1] = ('@', '+')) & board[1][1] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[0][1] = '.' & (board[2][1] = ('@', '+')) & board[1][1] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[0][1] = '-' & (board[-2][1] = ('@', '+')) & board[-1][1] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[0][1] = '.' & (board[-2][1] = ('@', '+')) & board[-1][1] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[0][1] = '-' & (board[0][3] = ('@', '+')) & board[0][2] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[0][1] = '.' & (board[0][3] = ('@', '+')) & board[0][2] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[0][2]) := case
+                    next(keeper_x) = 0 & next(keeper_y) = 2 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[0][2] = '+' & next(keeper_x) !=0 | next(keeper_y) != 2 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[0][2] = '@' & next(keeper_x) !=0 | next(keeper_y) != 2 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 0 & next(keeper_y) = 2 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[0][2] = '-' & (board[2][2] = ('@', '+')) & board[1][2] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[0][2] = '.' & (board[2][2] = ('@', '+')) & board[1][2] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[0][2] = '-' & (board[-2][2] = ('@', '+')) & board[-1][2] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[0][2] = '.' & (board[-2][2] = ('@', '+')) & board[-1][2] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[0][2] = '-' & (board[0][4] = ('@', '+')) & board[0][3] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[0][2] = '.' & (board[0][4] = ('@', '+')) & board[0][3] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[0][3]) := case
+                    next(keeper_x) = 0 & next(keeper_y) = 3 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[0][3] = '+' & next(keeper_x) !=0 | next(keeper_y) != 3 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[0][3] = '@' & next(keeper_x) !=0 | next(keeper_y) != 3 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 0 & next(keeper_y) = 3 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[0][3] = '-' & (board[2][3] = ('@', '+')) & board[1][3] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[0][3] = '.' & (board[2][3] = ('@', '+')) & board[1][3] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[0][3] = '-' & (board[-2][3] = ('@', '+')) & board[-1][3] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[0][3] = '.' & (board[-2][3] = ('@', '+')) & board[-1][3] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[0][3] = '-' & (board[0][5] = ('@', '+')) & board[0][4] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[0][3] = '.' & (board[0][5] = ('@', '+')) & board[0][4] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[0][4]) := case
+                    next(keeper_x) = 0 & next(keeper_y) = 4 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[0][4] = '+' & next(keeper_x) !=0 | next(keeper_y) != 4 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[0][4] = '@' & next(keeper_x) !=0 | next(keeper_y) != 4 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 0 & next(keeper_y) = 4 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[0][4] = '-' & (board[2][4] = ('@', '+')) & board[1][4] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[0][4] = '.' & (board[2][4] = ('@', '+')) & board[1][4] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[0][4] = '-' & (board[-2][4] = ('@', '+')) & board[-1][4] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[0][4] = '.' & (board[-2][4] = ('@', '+')) & board[-1][4] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[0][4] = '-' & (board[0][6] = ('@', '+')) & board[0][5] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[0][4] = '.' & (board[0][6] = ('@', '+')) & board[0][5] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[0][5]) := case
+                    next(keeper_x) = 0 & next(keeper_y) = 5 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[0][5] = '+' & next(keeper_x) !=0 | next(keeper_y) != 5 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[0][5] = '@' & next(keeper_x) !=0 | next(keeper_y) != 5 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 0 & next(keeper_y) = 5 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[0][5] = '-' & (board[2][5] = ('@', '+')) & board[1][5] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[0][5] = '.' & (board[2][5] = ('@', '+')) & board[1][5] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[0][5] = '-' & (board[-2][5] = ('@', '+')) & board[-1][5] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[0][5] = '.' & (board[-2][5] = ('@', '+')) & board[-1][5] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[0][5] = '-' & (board[0][7] = ('@', '+')) & board[0][6] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[0][5] = '.' & (board[0][7] = ('@', '+')) & board[0][6] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[1][0]) := case
+                    next(keeper_x) = 1 & next(keeper_y) = 0 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[1][0] = '+' & next(keeper_x) !=1 | next(keeper_y) != 0 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[1][0] = '@' & next(keeper_x) !=1 | next(keeper_y) != 0 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 1 & next(keeper_y) = 0 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[1][0] = '-' & (board[3][0] = ('@', '+')) & board[2][0] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[1][0] = '.' & (board[3][0] = ('@', '+')) & board[2][0] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[1][0] = '-' & (board[-1][0] = ('@', '+')) & board[0][0] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[1][0] = '.' & (board[-1][0] = ('@', '+')) & board[0][0] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[1][0] = '-' & (board[1][2] = ('@', '+')) & board[1][1] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[1][0] = '.' & (board[1][2] = ('@', '+')) & board[1][1] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[1][1]) := case
+                    next(keeper_x) = 1 & next(keeper_y) = 1 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[1][1] = '+' & next(keeper_x) !=1 | next(keeper_y) != 1 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[1][1] = '@' & next(keeper_x) !=1 | next(keeper_y) != 1 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 1 & next(keeper_y) = 1 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[1][1] = '-' & (board[3][1] = ('@', '+')) & board[2][1] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[1][1] = '.' & (board[3][1] = ('@', '+')) & board[2][1] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[1][1] = '-' & (board[-1][1] = ('@', '+')) & board[0][1] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[1][1] = '.' & (board[-1][1] = ('@', '+')) & board[0][1] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[1][1] = '-' & (board[1][3] = ('@', '+')) & board[1][2] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[1][1] = '.' & (board[1][3] = ('@', '+')) & board[1][2] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[1][2]) := case
+                    next(keeper_x) = 1 & next(keeper_y) = 2 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[1][2] = '+' & next(keeper_x) !=1 | next(keeper_y) != 2 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[1][2] = '@' & next(keeper_x) !=1 | next(keeper_y) != 2 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 1 & next(keeper_y) = 2 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[1][2] = '-' & (board[3][2] = ('@', '+')) & board[2][2] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[1][2] = '.' & (board[3][2] = ('@', '+')) & board[2][2] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[1][2] = '-' & (board[-1][2] = ('@', '+')) & board[0][2] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[1][2] = '.' & (board[-1][2] = ('@', '+')) & board[0][2] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[1][2] = '-' & (board[1][4] = ('@', '+')) & board[1][3] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[1][2] = '.' & (board[1][4] = ('@', '+')) & board[1][3] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[1][3]) := case
+                    next(keeper_x) = 1 & next(keeper_y) = 3 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[1][3] = '+' & next(keeper_x) !=1 | next(keeper_y) != 3 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[1][3] = '@' & next(keeper_x) !=1 | next(keeper_y) != 3 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 1 & next(keeper_y) = 3 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[1][3] = '-' & (board[3][3] = ('@', '+')) & board[2][3] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[1][3] = '.' & (board[3][3] = ('@', '+')) & board[2][3] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[1][3] = '-' & (board[-1][3] = ('@', '+')) & board[0][3] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[1][3] = '.' & (board[-1][3] = ('@', '+')) & board[0][3] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[1][3] = '-' & (board[1][5] = ('@', '+')) & board[1][4] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[1][3] = '.' & (board[1][5] = ('@', '+')) & board[1][4] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[1][4]) := case
+                    next(keeper_x) = 1 & next(keeper_y) = 4 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[1][4] = '+' & next(keeper_x) !=1 | next(keeper_y) != 4 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[1][4] = '@' & next(keeper_x) !=1 | next(keeper_y) != 4 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 1 & next(keeper_y) = 4 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[1][4] = '-' & (board[3][4] = ('@', '+')) & board[2][4] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[1][4] = '.' & (board[3][4] = ('@', '+')) & board[2][4] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[1][4] = '-' & (board[-1][4] = ('@', '+')) & board[0][4] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[1][4] = '.' & (board[-1][4] = ('@', '+')) & board[0][4] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[1][4] = '-' & (board[1][6] = ('@', '+')) & board[1][5] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[1][4] = '.' & (board[1][6] = ('@', '+')) & board[1][5] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[1][5]) := case
+                    next(keeper_x) = 1 & next(keeper_y) = 5 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[1][5] = '+' & next(keeper_x) !=1 | next(keeper_y) != 5 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[1][5] = '@' & next(keeper_x) !=1 | next(keeper_y) != 5 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 1 & next(keeper_y) = 5 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[1][5] = '-' & (board[3][5] = ('@', '+')) & board[2][5] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[1][5] = '.' & (board[3][5] = ('@', '+')) & board[2][5] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[1][5] = '-' & (board[-1][5] = ('@', '+')) & board[0][5] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[1][5] = '.' & (board[-1][5] = ('@', '+')) & board[0][5] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[1][5] = '-' & (board[1][7] = ('@', '+')) & board[1][6] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[1][5] = '.' & (board[1][7] = ('@', '+')) & board[1][6] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[2][0]) := case
+                    next(keeper_x) = 2 & next(keeper_y) = 0 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[2][0] = '+' & next(keeper_x) !=2 | next(keeper_y) != 0 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[2][0] = '@' & next(keeper_x) !=2 | next(keeper_y) != 0 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 2 & next(keeper_y) = 0 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[2][0] = '-' & (board[4][0] = ('@', '+')) & board[3][0] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[2][0] = '.' & (board[4][0] = ('@', '+')) & board[3][0] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[2][0] = '-' & (board[0][0] = ('@', '+')) & board[1][0] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[2][0] = '.' & (board[0][0] = ('@', '+')) & board[1][0] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[2][0] = '-' & (board[2][2] = ('@', '+')) & board[2][1] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[2][0] = '.' & (board[2][2] = ('@', '+')) & board[2][1] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[2][1]) := case
+                    next(keeper_x) = 2 & next(keeper_y) = 1 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[2][1] = '+' & next(keeper_x) !=2 | next(keeper_y) != 1 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[2][1] = '@' & next(keeper_x) !=2 | next(keeper_y) != 1 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 2 & next(keeper_y) = 1 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[2][1] = '-' & (board[4][1] = ('@', '+')) & board[3][1] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[2][1] = '.' & (board[4][1] = ('@', '+')) & board[3][1] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[2][1] = '-' & (board[0][1] = ('@', '+')) & board[1][1] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[2][1] = '.' & (board[0][1] = ('@', '+')) & board[1][1] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[2][1] = '-' & (board[2][3] = ('@', '+')) & board[2][2] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[2][1] = '.' & (board[2][3] = ('@', '+')) & board[2][2] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[2][2]) := case
+                    next(keeper_x) = 2 & next(keeper_y) = 2 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[2][2] = '+' & next(keeper_x) !=2 | next(keeper_y) != 2 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[2][2] = '@' & next(keeper_x) !=2 | next(keeper_y) != 2 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 2 & next(keeper_y) = 2 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[2][2] = '-' & (board[4][2] = ('@', '+')) & board[3][2] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[2][2] = '.' & (board[4][2] = ('@', '+')) & board[3][2] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[2][2] = '-' & (board[0][2] = ('@', '+')) & board[1][2] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[2][2] = '.' & (board[0][2] = ('@', '+')) & board[1][2] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[2][2] = '-' & (board[2][4] = ('@', '+')) & board[2][3] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[2][2] = '.' & (board[2][4] = ('@', '+')) & board[2][3] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[2][3]) := case
+                    next(keeper_x) = 2 & next(keeper_y) = 3 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[2][3] = '+' & next(keeper_x) !=2 | next(keeper_y) != 3 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[2][3] = '@' & next(keeper_x) !=2 | next(keeper_y) != 3 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 2 & next(keeper_y) = 3 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[2][3] = '-' & (board[4][3] = ('@', '+')) & board[3][3] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[2][3] = '.' & (board[4][3] = ('@', '+')) & board[3][3] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[2][3] = '-' & (board[0][3] = ('@', '+')) & board[1][3] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[2][3] = '.' & (board[0][3] = ('@', '+')) & board[1][3] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[2][3] = '-' & (board[2][5] = ('@', '+')) & board[2][4] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[2][3] = '.' & (board[2][5] = ('@', '+')) & board[2][4] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[2][4]) := case
+                    next(keeper_x) = 2 & next(keeper_y) = 4 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[2][4] = '+' & next(keeper_x) !=2 | next(keeper_y) != 4 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[2][4] = '@' & next(keeper_x) !=2 | next(keeper_y) != 4 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 2 & next(keeper_y) = 4 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[2][4] = '-' & (board[4][4] = ('@', '+')) & board[3][4] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[2][4] = '.' & (board[4][4] = ('@', '+')) & board[3][4] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[2][4] = '-' & (board[0][4] = ('@', '+')) & board[1][4] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[2][4] = '.' & (board[0][4] = ('@', '+')) & board[1][4] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[2][4] = '-' & (board[2][6] = ('@', '+')) & board[2][5] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[2][4] = '.' & (board[2][6] = ('@', '+')) & board[2][5] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[2][5]) := case
+                    next(keeper_x) = 2 & next(keeper_y) = 5 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[2][5] = '+' & next(keeper_x) !=2 | next(keeper_y) != 5 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[2][5] = '@' & next(keeper_x) !=2 | next(keeper_y) != 5 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 2 & next(keeper_y) = 5 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[2][5] = '-' & (board[4][5] = ('@', '+')) & board[3][5] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[2][5] = '.' & (board[4][5] = ('@', '+')) & board[3][5] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[2][5] = '-' & (board[0][5] = ('@', '+')) & board[1][5] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[2][5] = '.' & (board[0][5] = ('@', '+')) & board[1][5] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[2][5] = '-' & (board[2][7] = ('@', '+')) & board[2][6] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[2][5] = '.' & (board[2][7] = ('@', '+')) & board[2][6] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[3][0]) := case
+                    next(keeper_x) = 3 & next(keeper_y) = 0 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[3][0] = '+' & next(keeper_x) !=3 | next(keeper_y) != 0 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[3][0] = '@' & next(keeper_x) !=3 | next(keeper_y) != 0 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 3 & next(keeper_y) = 0 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[3][0] = '-' & (board[5][0] = ('@', '+')) & board[4][0] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[3][0] = '.' & (board[5][0] = ('@', '+')) & board[4][0] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[3][0] = '-' & (board[1][0] = ('@', '+')) & board[2][0] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[3][0] = '.' & (board[1][0] = ('@', '+')) & board[2][0] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[3][0] = '-' & (board[3][2] = ('@', '+')) & board[3][1] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[3][0] = '.' & (board[3][2] = ('@', '+')) & board[3][1] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[3][1]) := case
+                    next(keeper_x) = 3 & next(keeper_y) = 1 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[3][1] = '+' & next(keeper_x) !=3 | next(keeper_y) != 1 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[3][1] = '@' & next(keeper_x) !=3 | next(keeper_y) != 1 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 3 & next(keeper_y) = 1 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[3][1] = '-' & (board[5][1] = ('@', '+')) & board[4][1] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[3][1] = '.' & (board[5][1] = ('@', '+')) & board[4][1] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[3][1] = '-' & (board[1][1] = ('@', '+')) & board[2][1] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[3][1] = '.' & (board[1][1] = ('@', '+')) & board[2][1] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[3][1] = '-' & (board[3][3] = ('@', '+')) & board[3][2] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[3][1] = '.' & (board[3][3] = ('@', '+')) & board[3][2] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[3][2]) := case
+                    next(keeper_x) = 3 & next(keeper_y) = 2 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[3][2] = '+' & next(keeper_x) !=3 | next(keeper_y) != 2 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[3][2] = '@' & next(keeper_x) !=3 | next(keeper_y) != 2 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 3 & next(keeper_y) = 2 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[3][2] = '-' & (board[5][2] = ('@', '+')) & board[4][2] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[3][2] = '.' & (board[5][2] = ('@', '+')) & board[4][2] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[3][2] = '-' & (board[1][2] = ('@', '+')) & board[2][2] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[3][2] = '.' & (board[1][2] = ('@', '+')) & board[2][2] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[3][2] = '-' & (board[3][4] = ('@', '+')) & board[3][3] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[3][2] = '.' & (board[3][4] = ('@', '+')) & board[3][3] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[3][3]) := case
+                    next(keeper_x) = 3 & next(keeper_y) = 3 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[3][3] = '+' & next(keeper_x) !=3 | next(keeper_y) != 3 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[3][3] = '@' & next(keeper_x) !=3 | next(keeper_y) != 3 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 3 & next(keeper_y) = 3 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[3][3] = '-' & (board[5][3] = ('@', '+')) & board[4][3] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[3][3] = '.' & (board[5][3] = ('@', '+')) & board[4][3] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[3][3] = '-' & (board[1][3] = ('@', '+')) & board[2][3] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[3][3] = '.' & (board[1][3] = ('@', '+')) & board[2][3] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[3][3] = '-' & (board[3][5] = ('@', '+')) & board[3][4] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[3][3] = '.' & (board[3][5] = ('@', '+')) & board[3][4] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[3][4]) := case
+                    next(keeper_x) = 3 & next(keeper_y) = 4 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[3][4] = '+' & next(keeper_x) !=3 | next(keeper_y) != 4 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[3][4] = '@' & next(keeper_x) !=3 | next(keeper_y) != 4 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 3 & next(keeper_y) = 4 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[3][4] = '-' & (board[5][4] = ('@', '+')) & board[4][4] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[3][4] = '.' & (board[5][4] = ('@', '+')) & board[4][4] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[3][4] = '-' & (board[1][4] = ('@', '+')) & board[2][4] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[3][4] = '.' & (board[1][4] = ('@', '+')) & board[2][4] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[3][4] = '-' & (board[3][6] = ('@', '+')) & board[3][5] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[3][4] = '.' & (board[3][6] = ('@', '+')) & board[3][5] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[3][5]) := case
+                    next(keeper_x) = 3 & next(keeper_y) = 5 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[3][5] = '+' & next(keeper_x) !=3 | next(keeper_y) != 5 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[3][5] = '@' & next(keeper_x) !=3 | next(keeper_y) != 5 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 3 & next(keeper_y) = 5 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[3][5] = '-' & (board[5][5] = ('@', '+')) & board[4][5] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[3][5] = '.' & (board[5][5] = ('@', '+')) & board[4][5] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[3][5] = '-' & (board[1][5] = ('@', '+')) & board[2][5] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[3][5] = '.' & (board[1][5] = ('@', '+')) & board[2][5] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[3][5] = '-' & (board[3][7] = ('@', '+')) & board[3][6] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[3][5] = '.' & (board[3][7] = ('@', '+')) & board[3][6] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[4][0]) := case
+                    next(keeper_x) = 4 & next(keeper_y) = 0 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[4][0] = '+' & next(keeper_x) !=4 | next(keeper_y) != 0 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[4][0] = '@' & next(keeper_x) !=4 | next(keeper_y) != 0 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 4 & next(keeper_y) = 0 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[4][0] = '-' & (board[6][0] = ('@', '+')) & board[5][0] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[4][0] = '.' & (board[6][0] = ('@', '+')) & board[5][0] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[4][0] = '-' & (board[2][0] = ('@', '+')) & board[3][0] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[4][0] = '.' & (board[2][0] = ('@', '+')) & board[3][0] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[4][0] = '-' & (board[4][2] = ('@', '+')) & board[4][1] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[4][0] = '.' & (board[4][2] = ('@', '+')) & board[4][1] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[4][1]) := case
+                    next(keeper_x) = 4 & next(keeper_y) = 1 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[4][1] = '+' & next(keeper_x) !=4 | next(keeper_y) != 1 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[4][1] = '@' & next(keeper_x) !=4 | next(keeper_y) != 1 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 4 & next(keeper_y) = 1 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[4][1] = '-' & (board[6][1] = ('@', '+')) & board[5][1] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[4][1] = '.' & (board[6][1] = ('@', '+')) & board[5][1] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[4][1] = '-' & (board[2][1] = ('@', '+')) & board[3][1] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[4][1] = '.' & (board[2][1] = ('@', '+')) & board[3][1] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[4][1] = '-' & (board[4][3] = ('@', '+')) & board[4][2] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[4][1] = '.' & (board[4][3] = ('@', '+')) & board[4][2] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[4][2]) := case
+                    next(keeper_x) = 4 & next(keeper_y) = 2 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[4][2] = '+' & next(keeper_x) !=4 | next(keeper_y) != 2 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[4][2] = '@' & next(keeper_x) !=4 | next(keeper_y) != 2 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 4 & next(keeper_y) = 2 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[4][2] = '-' & (board[6][2] = ('@', '+')) & board[5][2] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[4][2] = '.' & (board[6][2] = ('@', '+')) & board[5][2] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[4][2] = '-' & (board[2][2] = ('@', '+')) & board[3][2] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[4][2] = '.' & (board[2][2] = ('@', '+')) & board[3][2] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[4][2] = '-' & (board[4][4] = ('@', '+')) & board[4][3] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[4][2] = '.' & (board[4][4] = ('@', '+')) & board[4][3] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[4][3]) := case
+                    next(keeper_x) = 4 & next(keeper_y) = 3 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[4][3] = '+' & next(keeper_x) !=4 | next(keeper_y) != 3 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[4][3] = '@' & next(keeper_x) !=4 | next(keeper_y) != 3 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 4 & next(keeper_y) = 3 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[4][3] = '-' & (board[6][3] = ('@', '+')) & board[5][3] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[4][3] = '.' & (board[6][3] = ('@', '+')) & board[5][3] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[4][3] = '-' & (board[2][3] = ('@', '+')) & board[3][3] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[4][3] = '.' & (board[2][3] = ('@', '+')) & board[3][3] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[4][3] = '-' & (board[4][5] = ('@', '+')) & board[4][4] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[4][3] = '.' & (board[4][5] = ('@', '+')) & board[4][4] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[4][4]) := case
+                    next(keeper_x) = 4 & next(keeper_y) = 4 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[4][4] = '+' & next(keeper_x) !=4 | next(keeper_y) != 4 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[4][4] = '@' & next(keeper_x) !=4 | next(keeper_y) != 4 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 4 & next(keeper_y) = 4 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[4][4] = '-' & (board[6][4] = ('@', '+')) & board[5][4] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[4][4] = '.' & (board[6][4] = ('@', '+')) & board[5][4] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[4][4] = '-' & (board[2][4] = ('@', '+')) & board[3][4] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[4][4] = '.' & (board[2][4] = ('@', '+')) & board[3][4] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[4][4] = '-' & (board[4][6] = ('@', '+')) & board[4][5] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[4][4] = '.' & (board[4][6] = ('@', '+')) & board[4][5] = '$' & next(action) = l : '*';
+                    
+                esac;
+            
+                next(board[4][5]) := case
+                    next(keeper_x) = 4 & next(keeper_y) = 5 : '@'; -- Keeper moves to this position
+        
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '+', then it becomes '.'
+                    board[4][5] = '+' & next(keeper_x) !=4 | next(keeper_y) != 5 : '.';
+                    
+                    -- if keeper is on x,y and he moves to another position, and board[x][y] is '@', then it becomes '-'
+                    board[4][5] = '@' & next(keeper_x) !=4 | next(keeper_y) != 5 : '-';
+                    
+                    -- if keeper moves to x,y, then it becomes '@'
+                    next(keeper_x) = 4 & next(keeper_y) = 5 : '@';
+                    
+                    -- if board[x][y] is '-' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[4][5] = '-' & (board[6][5] = ('@', '+')) & board[5][5] = '$' & next(action) = u : '$';
+                    
+                    -- if board[x][y] is '.' and board[x+2][y] is '@' or '+' and board[x+1][y] is '$' or '*', and next(action) is 'u' then it becomes '$'
+                    board[4][5] = '.' & (board[6][5] = ('@', '+')) & board[5][5] = '$' & next(action) = u : '*';
+                    
+                    -- if board[x][y] is '-' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[4][5] = '-' & (board[2][5] = ('@', '+')) & board[3][5] = '$' & next(action) = d : '$';
+                    
+                    -- if board[x][y] is '.' and board[x-2][y] is '@' or '+' and board[x-1][y] is '$' or '*', and next(action) is 'd' then it becomes '$'
+                    board[4][5] = '.' & (board[2][5] = ('@', '+')) & board[3][5] = '$' & next(action) = d : '*';
+                    
+                    -- if board[x][y] is '-' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[4][5] = '-' & (board[4][7] = ('@', '+')) & board[4][6] = '$' & next(action) = l : '$';
+                    
+                    -- if board[x][y] is '.' and board[x][y+2] is '@' or '+' and board[x][y+1] is '$' or '*', and next(action) is 'l' then it becomes '$'
+                    board[4][5] = '.' & (board[4][7] = ('@', '+')) & board[4][6] = '$' & next(action) = l : '*';
+                    
+                esac;
+             
 
     SPEC
-       AG (!box1_on_goal)
+    AG !(
+        CASE
+            TRUE : $ notin board
+            TRUE : TRUE
+        ESAC
+    )
+ 
     

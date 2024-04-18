@@ -21,25 +21,30 @@ def parse_board(xsb_input):
     lines = xsb_input.strip().splitlines()
     board_data['width'] = len(lines[0])
     board_data['height'] = len(lines)
-    for y, line in enumerate(lines):
-        for x, char in enumerate(line):
+    print("width", board_data['width'], "height", board_data['height'])
+
+    for x, line in enumerate(lines):
+        for y, char in enumerate(line):
             if char == '@':
                 board_data['wk_pos'] = (x, y)
             elif char == '$':
                 board_data['boxes'].append((x, y))
-            elif char == '.':
-                board_data['goals'].append((x, y))
-            elif char == '#':  # New!
-                board_data['walls'].append((x, y))
+                print("box", x, y)
+            # elif char == '.':
+            #     board_data['goals'].append((x, y))
+            #     print("goal", x, y)
+            # elif char == '#':  # New!
+            #     board_data['walls'].append((x, y))
             elif char == '+':  # New!
                 board_data['wk_pos'] = (x, y)
-                board_data['goals'].append((x, y))
+                # board_data['goals'].append((x, y))
             elif char == '*':  # New!
                 board_data['boxes'].append((x, y))
-                board_data['goals'].append((x, y))
+                # board_data['goals'].append((x, y))
             elif char == '-':  # New!
                 board_data['floors'].append((x, y))
 
+    print("floors", board_data['floors'])
     wall_array = []
     for line in xsb_input.strip().splitlines():
         row = []
@@ -51,7 +56,7 @@ def parse_board(xsb_input):
     for line in xsb_input.strip().splitlines():
         row = []
         for char in line:
-            row.append("TRUE" if char in ['.', '*'] else "FALSE")
+            row.append("TRUE" if char in ['.', '*', '+'] else "FALSE")
         goals_array.append(row)
 
     # boxes_array = []
@@ -71,6 +76,7 @@ def parse_board(xsb_input):
     # board_data['walls'] = wall_array  # Add to the board_data dictionary
 
     board_data['walls'] = wall_array
+    print("walls", board_data['walls'])
     board_data['goals'] = goals_array
     # board_data['boxes'] = boxes_array
     board_data['floors'] = floor_array
@@ -126,6 +132,7 @@ def generate_smv_state(board_data):
     grid_height = board_data['height']
     num_boxes = len(board_data['boxes'])
     wk_x, wk_y = board_data['wk_pos']
+    print("wk_x", wk_x, "wk_y", wk_y)
 
     smv_state = f"""
     
