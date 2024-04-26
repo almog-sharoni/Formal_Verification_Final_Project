@@ -92,9 +92,14 @@ def generate_smv_state(board):
 
         '''
 
-    for x in range(len(board)):
-        for y in range(len(board[0])):
-            smv_state += f'''
+    for x in range(-2, rows + 2):
+        for y in range(-2, columns + 2):
+            if x < 0 or y < 0 or x >= rows or y >= columns:
+                smv_state += f'''
+        next(board[{x}][{y}]) := "NULL";
+                       '''
+            else:
+                smv_state += f'''
         next(board[{x}][{y}]) := 
             case
                 board[{x}][{y}] = "KEEPER_ON_GOAL": 
@@ -166,9 +171,7 @@ def generate_smv_state(board):
                         (board[{x}][{y - 1}] = "KEEPER" | board[{x}][{y - 1}] = "KEEPER_ON_GOAL") & (board[{x}][{y + 1}] = "FLOOR" | board[{x}][{y + 1}] = "GOAL") & next(action) = r : "KEEPER_ON_GOAL";
                         TRUE : "BOX_ON_GOAL";    
                     esac;
-                    
-                board[{x}][{y}] = "WALL": "WALL";
-                board[{x}][{y}] = "NULL": "NULL";
+
 
                 TRUE : board[{x}][{y}];
 
@@ -218,7 +221,7 @@ def main():
         {generate_smv_state(board_data)} 
 
     SPEC
-    EF({generate_smv_win_spec(initial_board)})
+    AG(!({generate_smv_win_spec(initial_board)}))
 
     '''
 
