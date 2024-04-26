@@ -166,6 +166,9 @@ def generate_smv_state(board):
                         (board[{x}][{y - 1}] = "KEEPER" | board[{x}][{y - 1}] = "KEEPER_ON_GOAL") & (board[{x}][{y + 1}] = "FLOOR" | board[{x}][{y + 1}] = "GOAL") & next(action) = r : "KEEPER_ON_GOAL";
                         TRUE : "BOX_ON_GOAL";    
                     esac;
+                    
+                board[{x}][{y}] = "WALL": "WALL";
+                board[{x}][{y}] = "NULL": "NULL";
 
                 TRUE : board[{x}][{y}];
 
