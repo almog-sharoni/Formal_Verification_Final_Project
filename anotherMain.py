@@ -6,27 +6,14 @@
 # . - goal
 # - - floor
 def parse_board(xsb_input):
-    '''Parses the XSB representation.
-
-    Returns:
-
-    '''
-
-
     board_array = []
-    keeper_x = -1
-    keeper_y = -1
     for row in xsb_input.strip().splitlines():
         row_array = []
         for cell in row:
             if cell == "@":
                 row_array.append("KEEPER")
-                keeper_x = row.index(cell)
-                keeper_y = xsb_input.strip().splitlines().index(row)
             if cell == "+":
                 row_array.append("KEEPER_ON_GOAL")
-                keeper_x = row.index(cell)
-                keeper_y = xsb_input.strip().splitlines().index(row)
             if cell == "$":
                 row_array.append("BOX")
             if cell == "*":
@@ -39,9 +26,8 @@ def parse_board(xsb_input):
                 row_array.append("FLOOR")
         board_array.append(row_array)
 
+    return board_array
 
-
-    return board_array, keeper_x, keeper_y
 
 def generate_smv_define(board):
     smv_define = f'''
@@ -63,36 +49,30 @@ def generate_smv_var(board):
     print("columns: ", columns)
 
     smv_var = f'''
-        --Cell: {"KEEPER", "BOX", "GOAL", "KEEPER_ON_GOAL", "BOX_ON_GOAL", "WALL", "FLOOR"};
-        
-        --board : array 0..{rows-1} of array 0..{columns-1} of Cell;
-        
-        -- board : array 0..{rows-1} of array 0..{columns-1} of {{"KEEPER", "BOX", "GOAL", "KEEPER_ON_GOAL", "#", "FLOOR", "BOX_ON_GOAL"}}; 
+        -- Cell: {{"KEEPER", "BOX", "GOAL", "KEEPER_ON_GOAL", "BOX_ON_GOAL", "WALL", "FLOOR", "NULL"}};
+
+        -- board : array -2..rows+1 of array -2..columns+1 of Cell;
+
+        -- board : array 0..{rows - 1} of array 0..{columns - 1} of {{"KEEPER", "BOX", "GOAL", "KEEPER_ON_GOAL", "#", "FLOOR", "BOX_ON_GOAL"}}; 
         board : array -2..rows+1 of array -2..columns+1 of {{"KEEPER", "BOX", "GOAL", "KEEPER_ON_GOAL","WALL" , "FLOOR", "BOX_ON_GOAL", "NULL"}};  
-        
-        keeper_x : 0..rows_minus_one;
-        keeper_y : 0..columns_minus_one;
 
         action : {{u, d, l, r, 0}};  
-        
-    '''
 
+    '''
 
     return smv_var
 
-def generate_smv_state(board, keeper_x, keeper_y):
+
+def generate_smv_state(board):
     rows = len(board)
     columns = len(board[0])
 
     smv_state = f''' 
             init(action) := 0;
-            init(keeper_x) := {keeper_x};
-            init(keeper_y) := {keeper_y};
-            
             '''
     smv_state += f'''
             -- padding in 'NULL' the values outside the board
-                 
+
             '''
     for x in range(-2, rows + 2):
         for y in range(-2, columns + 2):
@@ -105,77 +85,91 @@ def generate_smv_state(board, keeper_x, keeper_y):
                        init(board[{x}][{y}]) := "{board[x][y]}";
                    '''
 
-    # smv_state += initWalls(board_data["walls"])
-
-    # Movement Constraints (Iterative)
     smv_state += f'''
-    
+
         -- dont need to refer the borders as we have walls
         next(action) := {{u, d, l, r}};
-    
-    
-        next(keeper_x) := case
-                -- keeper_x = {len(board)} - 1 : keeper_x; -- Cannot move right if at the right edge
-                -- keeper_x = 0 : keeper_x; -- Cannot move left if at the left edge
-                
-                (next(action) = u) & (board[keeper_x - 1][keeper_y] = "BOX" | board[keeper_x - 1][keeper_y] = "BOX_ON_GOAL") & (board[keeper_x - 2][keeper_y] = "FLOOR" | board[keeper_x - 2][keeper_y] = "GOAL") : keeper_x - 1;  -- Can move up if there is a box above
-                (next(action) = u) & (board[keeper_x - 1][keeper_y] = "FLOOR" | board[keeper_x - 1][keeper_y] = "GOAL") : keeper_x - 1;  -- Can move up if there is floor or goal above
-    
-                (next(action) = d) & (board[keeper_x + 1][keeper_y] = "BOX" | board[keeper_x + 1][keeper_y] = "BOX_ON_GOAL") & (board[keeper_x + 2][keeper_y] = "FLOOR" | board[keeper_x + 2][keeper_y] =  "GOAL"): keeper_x + 1;  -- Can move down if there is a box below
-                (next(action) = d) & (board[keeper_x + 1][keeper_y] = "FLOOR" | board[keeper_x + 1][keeper_y] = "GOAL"): keeper_x + 1;  -- Can move down if there is floor or goal below
-    
-                TRUE : keeper_x;  -- Default: stay in the same position if no valid move
-        esac;
-    
-        next(keeper_y) :=  case
-                -- keeper_y = {len(board[0])} - 1 : keeper_y; -- Cannot move right if at the right edge
-                -- keeper_y = 0 : keeper_y; -- Cannot move left if at the left edge
-                (next(action) = l) & (board[keeper_x][keeper_y - 1] = "BOX" | board[keeper_x][keeper_y - 1] = "BOX_ON_GOAL") & (board[keeper_x][keeper_y - 2] = "FLOOR" | board[keeper_x][keeper_y - 2] = "GOAL"): keeper_y - 1;  -- Can move left if there is a box to the left
-                (next(action) = l) & (board[keeper_x][keeper_y - 1] = "FLOOR" | board[keeper_x][keeper_y - 1] = "GOAL"): keeper_y - 1;  -- Can move left if there is floor or goal to the left
-    
-                (next(action) = r) & (board[keeper_x][keeper_y + 1] = "BOX" | board[keeper_x][keeper_y + 1] =  "BOX_ON_GOAL") & (board[keeper_x][keeper_y + 2] = "FLOOR" | board[keeper_x][keeper_y + 2] = "GOAL") : keeper_y + 1;  -- Can move right if there is a box to the right
-                (next(action) = r) & (board[keeper_x][keeper_y + 1] = "FLOOR" | board[keeper_x][keeper_y + 1] =  "GOAL"): keeper_y + 1;  -- Can move right if there is floor or goal to the right
-    
-                TRUE : keeper_y;  -- Default: stay in the same position if no valid move
-        esac;
-    
+
         '''
 
     for x in range(len(board)):
         for y in range(len(board[0])):
             smv_state += f'''
-                next(board[{x}][{y}]) := case
-    
-                    board[{x}][{y}] = "KEEPER_ON_GOAL" & (next(keeper_x) !={x} | next(keeper_y) != {y}) : "GOAL";
-                
-                    board[{x}][{y}] = "KEEPER" & (next(keeper_x) !={x} | next(keeper_y) != {y}) : "FLOOR";
-                    
-                    board[{x}][{y}] = "FLOOR" & (board[{x+2}][{y}] = "KEEPER" | board[{x+2}][{y}] = "KEEPER_ON_GOAL") & (board[{x+1}][{y}] = "BOX" | board[{x+1}][{y}] = "BOX_ON_GOAL") & next(action) = u : "BOX";
-                    
-                    board[{x}][{y}] = "FLOOR" & (board[{x-2}][{y}] = "KEEPER" | board[{x-2}][{y}] = "KEEPER_ON_GOAL") & (board[{x-1}][{y}] = "BOX" | board[{x-1}][{y}] = "BOX_ON_GOAL") & next(action) = d : "BOX";
-                    
-                    board[{x}][{y}] = "FLOOR" & (board[{x}][{y+2}] = "KEEPER" | board[{x}][{y+2}] = "KEEPER_ON_GOAL") & (board[{x}][{y+1}] = "BOX" | board[{x}][{y+1}] = "BOX_ON_GOAL") & next(action) = l : "BOX";
-                    
-                    board[{x}][{y}] = "FLOOR" & (board[{x}][{y-2}] = "KEEPER" | board[{x}][{y-2}] = "KEEPER_ON_GOAL") & (board[{x}][{y-1}] = "BOX" | board[{x}][{y-1}] = "BOX_ON_GOAL") & next(action) = r : "BOX";
-                    
-                    board[{x}][{y}] = "GOAL" & (board[{x+2}][{y}] = "KEEPER" | board[{x+2}][{y}] = "KEEPER_ON_GOAL") & (board[{x+1}][{y}] = "BOX" | board[{x+1}][{y}] = "BOX_ON_GOAL") & next(action) = u : "BOX_ON_GOAL";
-                    
-                    board[{x}][{y}] = "GOAL" & (board[{x-2}][{y}] = "KEEPER" | board[{x-2}][{y}] = "KEEPER_ON_GOAL") & (board[{x-1}][{y}] = "BOX" | board[{x-1}][{y}] = "BOX_ON_GOAL") & next(action) = d : "BOX_ON_GOAL";
-                    
-                    board[{x}][{y}] = "GOAL" & (board[{x}][{y+2}] = "KEEPER" | board[{x}][{y+2}] = "KEEPER_ON_GOAL") & (board[{x}][{y+1}] = "BOX" | board[{x}][{y+1}] = "BOX_ON_GOAL") & next(action) = l : "BOX_ON_GOAL";
-                    
-                    board[{x}][{y}] = "GOAL" & (board[{x}][{y-2}] = "KEEPER" | board[{x}][{y-2}] = "KEEPER_ON_GOAL") & (board[{x}][{y-1}] = "BOX" | board[{x}][{y-1}] = "BOX_ON_GOAL") & next(action) = r : "BOX_ON_GOAL";
-                    
-                    (board[{x}][{y}] = "GOAL" | board[{x}][{y}] = "FLOOR") & next(keeper_x) = {x} & next(keeper_y) = {y} : "KEEPER";
-                    
-                    board[{x}][{y}] = "BOX" & next(keeper_x) = {x} & next(keeper_y) = {y} : "KEEPER";
-                    
-                    board[{x}][{y}] = "BOX_ON_GOAL" & next(keeper_x) = {x} & next(keeper_y) = {y} : "KEEPER_ON_GOAL";
-                    
-                    
-                    --default
-                    TRUE : board[{x}][{y}];
-                esac;
+        next(board[{x}][{y}]) := 
+            case
+                board[{x}][{y}] = "KEEPER_ON_GOAL": 
+                    case
+                        board[{x + 1}][{y}] = "FLOOR" & next(action) = d : "GOAL";
+                        board[{x - 1}][{y}] = "FLOOR" & next(action) = u : "GOAL";
+                        board[{x}][{y + 1}] = "FLOOR" & next(action) = r : "GOAL";
+                        board[{x}][{y - 1}] = "FLOOR" & next(action) = l : "GOAL";
+                        board[{x + 1}][{y}] = "BOX" & (board[{x + 2}][{y}] = "FLOOR" | board[{x + 2}][{y}] = "GOAL") & next(action) = d : "GOAL";
+                        board[{x - 1}][{y}] = "BOX" & (board[{x - 2}][{y}] = "FLOOR" | board[{x - 2}][{y}] = "GOAL") & next(action) = u : "GOAL";
+                        board[{x}][{y + 1}] = "BOX" & (board[{x}][{y + 2}] = "FLOOR" | board[{x}][{y + 2}] = "GOAL") & next(action) = r : "GOAL";
+                        board[{x}][{y - 1}] = "BOX" & (board[{x}][{y - 2}] = "FLOOR" | board[{x}][{y - 2}] = "GOAL") & next(action) = l : "GOAL";
+                        TRUE : "KEEPER_ON_GOAL";
+                    esac;
+
+                board[{x}][{y}] = "KEEPER":
+                    case
+                        board[{x + 1}][{y}] = "FLOOR" & next(action) = d : "FLOOR";
+                        board[{x - 1}][{y}] = "FLOOR" & next(action) = u : "FLOOR";
+                        board[{x}][{y + 1}] = "FLOOR" & next(action) = r : "FLOOR";
+                        board[{x}][{y - 1}] = "FLOOR" & next(action) = l : "FLOOR";
+                        board[{x + 1}][{y}] = "BOX" & (board[{x + 2}][{y}] = "FLOOR" | board[{x + 2}][{y}] = "GOAL") & next(action) = d : "FLOOR";
+                        board[{x - 1}][{y}] = "BOX" & (board[{x - 2}][{y}] = "FLOOR" | board[{x - 2}][{y}] = "GOAL") & next(action) = u : "FLOOR";
+                        board[{x}][{y + 1}] = "BOX" & (board[{x}][{y + 2}] = "FLOOR" | board[{x}][{y + 2}] = "GOAL") & next(action) = r : "FLOOR";
+                        board[{x}][{y - 1}] = "BOX" & (board[{x}][{y - 2}] = "FLOOR" | board[{x}][{y - 2}] = "GOAL") & next(action) = l : "FLOOR";
+                        TRUE : "KEEPER";
+                    esac;
+
+                board[{x}][{y}] = "FLOOR":
+                    case
+                        (board[{x + 1}][{y}] = "KEEPER" | board[{x + 1}][{y}] = "KEEPER_ON_GOAL") & next(action) = u : "KEEPER";
+                        (board[{x - 1}][{y}] = "KEEPER" | board[{x - 1}][{y}] = "KEEPER_ON_GOAL") & next(action) = d : "KEEPER";
+                        (board[{x}][{y + 1}] = "KEEPER" | board[{x}][{y + 1}] = "KEEPER_ON_GOAL") & next(action) = l : "KEEPER";
+                        (board[{x}][{y - 1}] = "KEEPER" | board[{x}][{y - 1}] = "KEEPER_ON_GOAL") & next(action) = r : "KEEPER";
+                        (board[{x + 2}][{y}] = "KEEPER" | board[{x + 2}][{y}] = "KEEPER_ON_GOAL") & (board[{x + 1}][{y}] = "BOX" | board[{x + 1}][{y}] = "BOX_ON_GOAL") & next(action) = u : "BOX";
+                        (board[{x - 2}][{y}] = "KEEPER" | board[{x - 2}][{y}] = "KEEPER_ON_GOAL") & (board[{x - 1}][{y}] = "BOX" | board[{x - 1}][{y}] = "BOX_ON_GOAL") & next(action) = d : "BOX";
+                        (board[{x}][{y + 2}] = "KEEPER" | board[{x}][{y + 2}] = "KEEPER_ON_GOAL") & (board[{x}][{y + 1}] = "BOX" | board[{x}][{y + 1}] = "BOX_ON_GOAL") & next(action) = l : "BOX";
+                        (board[{x}][{y - 2}] = "KEEPER" | board[{x}][{y - 2}] = "KEEPER_ON_GOAL") & (board[{x}][{y - 1}] = "BOX" | board[{x}][{y - 1}] = "BOX_ON_GOAL") & next(action) = r : "BOX";
+                        TRUE : "FLOOR";
+                    esac;
+
+                board[{x}][{y}] = "GOAL":
+                    case
+                        (board[{x + 1}][{y}] = "KEEPER" | board[{x + 1}][{y}] = "KEEPER_ON_GOAL") & next(action) = u : "BOX_ON_GOAL";
+                        (board[{x - 1}][{y}] = "KEEPER" | board[{x - 1}][{y}] = "KEEPER_ON_GOAL") & next(action) = d : "BOX_ON_GOAL";
+                        (board[{x}][{y + 1}] = "KEEPER" | board[{x}][{y + 1}] = "KEEPER_ON_GOAL") & next(action) = l : "BOX_ON_GOAL";
+                        (board[{x}][{y - 1}] = "KEEPER" | board[{x}][{y - 1}] = "KEEPER_ON_GOAL") & next(action) = r : "BOX_ON_GOAL";
+                        (board[{x + 2}][{y}] = "KEEPER" | board[{x + 2}][{y}] = "KEEPER_ON_GOAL") & (board[{x + 1}][{y}] = "BOX" | board[{x + 1}][{y}] = "BOX_ON_GOAL") & next(action) = u : "BOX_ON_GOAL";
+                        (board[{x - 2}][{y}] = "KEEPER" | board[{x - 2}][{y}] = "KEEPER_ON_GOAL") & (board[{x - 1}][{y}] = "BOX" | board[{x - 1}][{y}] = "BOX_ON_GOAL") & next(action) = d : "BOX_ON_GOAL";
+                        (board[{x}][{y + 2}] = "KEEPER" | board[{x}][{y + 2}] = "KEEPER_ON_GOAL") & (board[{x}][{y + 1}] = "BOX" | board[{x}][{y + 1}] = "BOX_ON_GOAL") & next(action) = l : "BOX_ON_GOAL";
+                        (board[{x}][{y - 2}] = "KEEPER" | board[{x}][{y - 2}] = "KEEPER_ON_GOAL") & (board[{x}][{y - 1}] = "BOX" | board[{x}][{y - 1}] = "BOX_ON_GOAL") & next(action) = r : "BOX_ON_GOAL";
+                        TRUE : "GOAL";
+                    esac;
+
+                board[{x}][{y}] = "BOX":
+                    case
+                        (board[{x + 1}][{y}] = "KEEPER" | board[{x + 1}][{y}] = "KEEPER_ON_GOAL") & (board[{x - 1}][{y}] = "FLOOR" | board[{x - 1}][{y}] = "GOAL") & next(action) = u : "KEEPER";
+                        (board[{x - 1}][{y}] = "KEEPER" | board[{x - 1}][{y}] = "KEEPER_ON_GOAL") & (board[{x + 1}][{y}] = "FLOOR" | board[{x + 1}][{y}] = "GOAL") & next(action) = d : "KEEPER";
+                        (board[{x}][{y + 1}] = "KEEPER" | board[{x}][{y + 1}] = "KEEPER_ON_GOAL") & (board[{x}][{y - 1}] = "FLOOR" | board[{x}][{y - 1}] = "GOAL") & next(action) = l : "KEEPER";
+                        (board[{x}][{y - 1}] = "KEEPER" | board[{x}][{y - 1}] = "KEEPER_ON_GOAL") & (board[{x}][{y + 1}] = "FLOOR" | board[{x}][{y + 1}] = "GOAL") & next(action) = r : "KEEPER";
+                        TRUE : "BOX";    
+                    esac;
+
+                board[{x}][{y}] = "BOX_ON_GOAL":
+                    case
+                        (board[{x + 1}][{y}] = "KEEPER" | board[{x + 1}][{y}] = "KEEPER_ON_GOAL") & (board[{x - 1}][{y}] = "FLOOR" | board[{x - 1}][{y}] = "GOAL") & next(action) = u : "KEEPER_ON_GOAL";
+                        (board[{x - 1}][{y}] = "KEEPER" | board[{x - 1}][{y}] = "KEEPER_ON_GOAL") & (board[{x + 1}][{y}] = "FLOOR" | board[{x + 1}][{y}] = "GOAL") & next(action) = d : "KEEPER_ON_GOAL";
+                        (board[{x}][{y + 1}] = "KEEPER" | board[{x}][{y + 1}] = "KEEPER_ON_GOAL") & (board[{x}][{y - 1}] = "FLOOR" | board[{x}][{y - 1}] = "GOAL") & next(action) = l : "KEEPER_ON_GOAL";
+                        (board[{x}][{y - 1}] = "KEEPER" | board[{x}][{y - 1}] = "KEEPER_ON_GOAL") & (board[{x}][{y + 1}] = "FLOOR" | board[{x}][{y + 1}] = "GOAL") & next(action) = r : "KEEPER_ON_GOAL";
+                        TRUE : "BOX_ON_GOAL";    
+                    esac;
+
+                TRUE : board[{x}][{y}];
+
+            esac;
             '''
 
     # TODO: should add more box movement constraints here (e.g., preventing two-box pushes and box-wall collisions)
@@ -183,23 +177,19 @@ def generate_smv_state(board, keeper_x, keeper_y):
     return smv_state
 
 
-
-
-
 def generate_smv_win_spec(board_data):
-    '''Encodes the LTL win condition in SMV syntax.
-
-    Returns:
-        String containing the SMV specification
-    '''
-    smv_win_spec = f'''
-    -- Win condition: all boxes are on goals
-
-    '''
+    # save goals locations in array to use it in the win condition
+    goals = []
     for x in range(len(board_data)):
         for y in range(len(board_data[0])):
-            if board_data[x][y] == "BOX_ON_GOAL" or board_data[x][y] == "GOAL":
-                smv_win_spec += f''' board[{x}][{y}] = "BOX_ON_GOAL" '''
+            if board_data[x][y] == "GOAL" or board_data[x][y] == "BOX_ON_GOAL":
+                goals.append((x, y))
+                print("goal: ", goals)
+
+    smv_win_spec = f''' board[{goals[0][0]}][{goals[0][1]}] = "BOX_ON_GOAL" '''
+    for i in range(1, len(goals)):
+        smv_win_spec += f''' & board[{goals[i][0]}][{goals[i][1]}] = "BOX_ON_GOAL" '''
+
     return smv_win_spec
 
 
@@ -212,8 +202,8 @@ def main():
 ------
 '''  # Example board
 
-    board_data, keeper_x, keeper_y = parse_board(xsb_board)
-
+    board_data = parse_board(xsb_board)
+    initial_board = board_data
     smv_model = f'''
     MODULE main 
     DEFINE
@@ -222,16 +212,14 @@ def main():
         {generate_smv_var(board_data)}
 
     ASSIGN
-        {generate_smv_state(board_data, keeper_x, keeper_y)} 
+        {generate_smv_state(board_data)} 
 
     SPEC
-    AG !(
-        {generate_smv_win_spec(board_data)}
-    )
- 
+    EF({generate_smv_win_spec(initial_board)})
+
     '''
 
-    with open("sokoban_model.smv", "w") as f:
+    with open("sokoban.smv", "w") as f:
         f.write(smv_model)
 
 
