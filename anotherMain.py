@@ -159,10 +159,10 @@ def generate_smv_state(board):
 
                 board[{x}][{y}] = "GOAL":
                     case
-                        (board[{x + 1}][{y}] = "KEEPER" | board[{x + 1}][{y}] = "KEEPER_ON_GOAL") & next(action) = u : "BOX_ON_GOAL";
-                        (board[{x - 1}][{y}] = "KEEPER" | board[{x - 1}][{y}] = "KEEPER_ON_GOAL") & next(action) = d : "BOX_ON_GOAL";
-                        (board[{x}][{y + 1}] = "KEEPER" | board[{x}][{y + 1}] = "KEEPER_ON_GOAL") & next(action) = l : "BOX_ON_GOAL";
-                        (board[{x}][{y - 1}] = "KEEPER" | board[{x}][{y - 1}] = "KEEPER_ON_GOAL") & next(action) = r : "BOX_ON_GOAL";
+                        (board[{x + 1}][{y}] = "KEEPER" | board[{x + 1}][{y}] = "KEEPER_ON_GOAL") & next(action) = u : "GOAL";--logic problem was here!
+                        (board[{x - 1}][{y}] = "KEEPER" | board[{x - 1}][{y}] = "KEEPER_ON_GOAL") & next(action) = d : "GOAL";--logic problem was here!
+                        (board[{x}][{y + 1}] = "KEEPER" | board[{x}][{y + 1}] = "KEEPER_ON_GOAL") & next(action) = l : "GOAL";--logic problem was here!
+                        (board[{x}][{y - 1}] = "KEEPER" | board[{x}][{y - 1}] = "KEEPER_ON_GOAL") & next(action) = r : "GOAL"; --logic problem was here!
                         (board[{x + 2}][{y}] = "KEEPER" | board[{x + 2}][{y}] = "KEEPER_ON_GOAL") & (board[{x + 1}][{y}] = "BOX" | board[{x + 1}][{y}] = "BOX_ON_GOAL") & next(action) = u : "BOX_ON_GOAL";
                         (board[{x - 2}][{y}] = "KEEPER" | board[{x - 2}][{y}] = "KEEPER_ON_GOAL") & (board[{x - 1}][{y}] = "BOX" | board[{x - 1}][{y}] = "BOX_ON_GOAL") & next(action) = d : "BOX_ON_GOAL";
                         (board[{x}][{y + 2}] = "KEEPER" | board[{x}][{y + 2}] = "KEEPER_ON_GOAL") & (board[{x}][{y + 1}] = "BOX" | board[{x}][{y + 1}] = "BOX_ON_GOAL") & next(action) = l : "BOX_ON_GOAL";
@@ -217,18 +217,16 @@ def generate_smv_win_spec(board_data):
 
 def main():
     xsb_board = '''
-------
-#-.--#
-#-$--#
-#-@#-#
-------
+@.
+-$
+--
 '''  # Example board
     # Example board
-    xsb_board = """
--.-
--$-
--@-
-"""
+#     xsb_board = """
+# -.-
+# -$-
+# -@-
+# """
 
     board_data = parse_board(xsb_board)
     initial_board = board_data
@@ -243,7 +241,7 @@ def main():
         {generate_smv_state(board_data)} 
 
     LTLSPEC
-    F(X(!({generate_smv_win_spec(initial_board)})))
+    G(!({generate_smv_win_spec(initial_board)}))
 
     '''
 
