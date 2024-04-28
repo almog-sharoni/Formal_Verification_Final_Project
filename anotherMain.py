@@ -57,6 +57,8 @@ def generate_smv_var(board):
         board : array -2..rows+1 of array -2..columns+1 of {{"KEEPER", "BOX", "GOAL", "KEEPER_ON_GOAL","WALL" , "FLOOR", "BOX_ON_GOAL", "NULL"}};  
 
         action : {{u, d, l, r, 0}};  
+        
+        box_on_goal : boolean;
 
     '''
 
@@ -85,10 +87,24 @@ def generate_smv_state(board):
                        init(board[{x}][{y}]) := "{board[x][y]}";
                    '''
 
+    goals = []
+    for x in range(len(board)):
+        for y in range(len(board[0])):
+            if board[x][y] == "GOAL" or board[x][y] == "BOX_ON_GOAL":
+                goals.append((x, y))
+                print("goal: ", goals)
+
     smv_state += f'''
 
         -- dont need to refer the borders as we have walls
         next(action) := {{u, d, l, r}};
+        
+        next(box_on_goal) := case
+            board[{goals[0][0]}][{goals[0][1]}] = "BOX_ON_GOAL" : TRUE;
+            TRUE : FALSE;
+        esac;
+        
+        
 
         '''
 
@@ -207,6 +223,12 @@ def main():
 #-@#-#
 ------
 '''  # Example board
+    # Example board
+    xsb_board = """
+-.-
+-$-
+-@-
+"""
 
     board_data = parse_board(xsb_board)
     initial_board = board_data
@@ -220,8 +242,8 @@ def main():
     ASSIGN
         {generate_smv_state(board_data)} 
 
-    SPEC
-    AG(!({generate_smv_win_spec(initial_board)}))
+    LTLSPEC
+    F(X(!({generate_smv_win_spec(initial_board)})))
 
     '''
 
