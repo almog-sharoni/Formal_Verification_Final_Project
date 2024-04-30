@@ -194,11 +194,11 @@ def generate_smv_state(board):
             esac;
             '''
 
-
     return smv_state
 
 
-def generate_smv_win_spec(board_data):
+
+def generate_smv_win_spec(board_data, iterative=False):
     # save goals locations in array to use it in the win condition
     goals = []
     for x in range(len(board_data)):
@@ -207,9 +207,14 @@ def generate_smv_win_spec(board_data):
                 goals.append((x, y))
                 # print("goal: ", goals)
 
-    smv_win_spec = f''' board[{goals[0][0]}][{goals[0][1]}] = "BOX_ON_GOAL" '''
-    for i in range(1, len(goals)):
-        smv_win_spec += f''' & board[{goals[i][0]}][{goals[i][1]}] = "BOX_ON_GOAL" '''
+    if iterative:
+        smv_win_spec = f'''LTLSPEC G(!( board[{goals[0][0]}][{goals[0][1]}] = "BOX_ON_GOAL" )) '''
+        for i in range(1, len(goals)):
+            smv_win_spec += f''' LTLSPEC G(!( board[{goals[i][0]}][{goals[i][1]}] = "BOX_ON_GOAL" ))'''
+    else:
+        smv_win_spec = f'''LTLSPEC G(!( board[{goals[0][0]}][{goals[0][1]}] = "BOX_ON_GOAL" '''
+        for i in range(1, len(goals)):
+            smv_win_spec += f''' & board[{goals[i][0]}][{goals[i][1]}] = "BOX_ON_GOAL" ))'''
 
     return smv_win_spec
 
@@ -218,29 +223,29 @@ def main():
     xsb_board = '''
 -----
 @----
--$-#-
----#.
+$$-#-
+.--#.
 '''  # Example board
 
-#     xsb_board = '''
-# ----#####----------
-# ----#---#----------
-# ----#$--#----------
-# --###--$##---------
-# --#--$-$-#---------
-# ###-#-##-#---######
-# #---#-##-#####--..#
-# #-$--$----------..#
-# #####-###-#@##--..#
-# ----#-----#########
-# ----#######--------
-# '''
-#     Example board
-#     xsb_board = """
-# -.-
-# -$-
-# -@-
-# """
+    #     xsb_board = '''
+    # ----#####----------
+    # ----#---#----------
+    # ----#$--#----------
+    # --###--$##---------
+    # --#--$-$-#---------
+    # ###-#-##-#---######
+    # #---#-##-#####--..#
+    # #-$--$----------..#
+    # #####-###-#@##--..#
+    # ----#-----#########
+    # ----#######--------
+    # '''
+    #     Example board
+    xsb_board = """
+-..
+-$$
+-@-
+"""
 
     board_data = parse_board(xsb_board)
     initial_board = board_data
@@ -254,8 +259,8 @@ def main():
     ASSIGN
         {generate_smv_state(board_data)} 
 
-    LTLSPEC
-    G(!({generate_smv_win_spec(initial_board)}))
+    --LTLSPEC
+        {generate_smv_win_spec(initial_board)}
 
     '''
 
