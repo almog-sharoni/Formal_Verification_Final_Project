@@ -45,8 +45,8 @@ def generate_smv_var(board):
     rows = len(board)
     columns = len(board[0])
 
-    print("rows: ", rows)
-    print("columns: ", columns)
+    # print("rows: ", rows)
+    # print("columns: ", columns)
 
     smv_var = f'''
         -- Cell: {{"KEEPER", "BOX", "GOAL", "KEEPER_ON_GOAL", "BOX_ON_GOAL", "WALL", "FLOOR", "NULL"}};
@@ -92,7 +92,7 @@ def generate_smv_state(board):
         for y in range(len(board[0])):
             if board[x][y] == "GOAL" or board[x][y] == "BOX_ON_GOAL":
                 goals.append((x, y))
-                print("goal: ", goals)
+                # print("goal: ", goals)
 
     smv_state += f'''
 
@@ -194,7 +194,6 @@ def generate_smv_state(board):
             esac;
             '''
 
-    # TODO: should add more box movement constraints here (e.g., preventing two-box pushes and box-wall collisions)
 
     return smv_state
 
@@ -206,7 +205,7 @@ def generate_smv_win_spec(board_data):
         for y in range(len(board_data[0])):
             if board_data[x][y] == "GOAL" or board_data[x][y] == "BOX_ON_GOAL":
                 goals.append((x, y))
-                print("goal: ", goals)
+                # print("goal: ", goals)
 
     smv_win_spec = f''' board[{goals[0][0]}][{goals[0][1]}] = "BOX_ON_GOAL" '''
     for i in range(1, len(goals)):
@@ -222,7 +221,21 @@ def main():
 -$-#-
 ---#.
 '''  # Example board
-    # Example board
+
+#     xsb_board = '''
+# ----#####----------
+# ----#---#----------
+# ----#$--#----------
+# --###--$##---------
+# --#--$-$-#---------
+# ###-#-##-#---######
+# #---#-##-#####--..#
+# #-$--$----------..#
+# #####-###-#@##--..#
+# ----#-----#########
+# ----#######--------
+# '''
+#     Example board
 #     xsb_board = """
 # -.-
 # -$-

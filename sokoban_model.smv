@@ -1,277 +1,189 @@
 
     MODULE main 
-    DEFINE
-        
-        rows := 5;
-        columns := 6;
-        rows_minus_one := rows - 1;
-        columns_minus_one := columns - 1;
-
-        
     VAR
+       
+    
+        wk_x : 0..5; 
+        wk_y : 0..4; 
         
-        --Cell: ('KEEPER', 'BOX', 'GOAL', 'KEEPER_ON_GOAL', 'BOX_ON_GOAL', 'WALL', 'FLOOR');
-
-        --board : array 0..4 of array 0..5 of Cell;
-
-        -- board : array 0..4 of array 0..5 of {"KEEPER", "BOX", "GOAL", "KEEPER_ON_GOAL", "#", "FLOOR", "BOX_ON_GOAL"}; 
-        board : array -2..rows+1 of array -2..columns+1 of {"KEEPER", "BOX", "GOAL", "KEEPER_ON_GOAL","WALL" , "FLOOR", "BOX_ON_GOAL", "NULL"};  
-
-        keeper_x : 0..rows_minus_one;
-        keeper_y : 0..columns_minus_one;
-
-        action : {u, d, l, r, 0};  
+        box1_x : 0..5;
+        box1_y : 0..4;
+        box1_on_goal : boolean; 
+        
+        walls : array 0..6 of array 0..6 of boolean; 
+        
+        goals : array 0..6 of array 0..6 of boolean;
+        
+        floors : array 0..6 of array 0..6 of boolean;
 
     
+        action : {up, down, left, right,0};  
 
-    ASSIGN
-         
-            init(action) := 0;
-            init(keeper_x) := 2;
-            init(keeper_y) := 3;
-
-            
-            -- padding in 'NULL' the values outside the board
-
-            
-                       init(board[-2][-2]) := "NULL";
-                   
-                       init(board[-2][-1]) := "NULL";
-                   
-                       init(board[-2][0]) := "NULL";
-                   
-                       init(board[-2][1]) := "NULL";
-                   
-                       init(board[-2][2]) := "NULL";
-                   
-                       init(board[-2][3]) := "NULL";
-                   
-                       init(board[-2][4]) := "NULL";
-                   
-                       init(board[-2][5]) := "NULL";
-                   
-                       init(board[-2][6]) := "NULL";
-                   
-                       init(board[-2][7]) := "NULL";
-                   
-                       init(board[-1][-2]) := "NULL";
-                   
-                       init(board[-1][-1]) := "NULL";
-                   
-                       init(board[-1][0]) := "NULL";
-                   
-                       init(board[-1][1]) := "NULL";
-                   
-                       init(board[-1][2]) := "NULL";
-                   
-                       init(board[-1][3]) := "NULL";
-                   
-                       init(board[-1][4]) := "NULL";
-                   
-                       init(board[-1][5]) := "NULL";
-                   
-                       init(board[-1][6]) := "NULL";
-                   
-                       init(board[-1][7]) := "NULL";
-                   
-                       init(board[0][-2]) := "NULL";
-                   
-                       init(board[0][-1]) := "NULL";
-                   
-                       init(board[0][0]) := "FLOOR";
-                   
-                       init(board[0][1]) := "FLOOR";
-                   
-                       init(board[0][2]) := "FLOOR";
-                   
-                       init(board[0][3]) := "FLOOR";
-                   
-                       init(board[0][4]) := "FLOOR";
-                   
-                       init(board[0][5]) := "FLOOR";
-                   
-                       init(board[0][6]) := "NULL";
-                   
-                       init(board[0][7]) := "NULL";
-                   
-                       init(board[1][-2]) := "NULL";
-                   
-                       init(board[1][-1]) := "NULL";
-                   
-                       init(board[1][0]) := "WALL";
-                   
-                       init(board[1][1]) := "FLOOR";
-                   
-                       init(board[1][2]) := "GOAL";
-                   
-                       init(board[1][3]) := "FLOOR";
-                   
-                       init(board[1][4]) := "FLOOR";
-                   
-                       init(board[1][5]) := "WALL";
-                   
-                       init(board[1][6]) := "NULL";
-                   
-                       init(board[1][7]) := "NULL";
-                   
-                       init(board[2][-2]) := "NULL";
-                   
-                       init(board[2][-1]) := "NULL";
-                   
-                       init(board[2][0]) := "WALL";
-                   
-                       init(board[2][1]) := "FLOOR";
-                   
-                       init(board[2][2]) := "BOX";
-                   
-                       init(board[2][3]) := "FLOOR";
-                   
-                       init(board[2][4]) := "FLOOR";
-                   
-                       init(board[2][5]) := "WALL";
-                   
-                       init(board[2][6]) := "NULL";
-                   
-                       init(board[2][7]) := "NULL";
-                   
-                       init(board[3][-2]) := "NULL";
-                   
-                       init(board[3][-1]) := "NULL";
-                   
-                       init(board[3][0]) := "WALL";
-                   
-                       init(board[3][1]) := "FLOOR";
-                   
-                       init(board[3][2]) := "KEEPER";
-                   
-                       init(board[3][3]) := "WALL";
-                   
-                       init(board[3][4]) := "FLOOR";
-                   
-                       init(board[3][5]) := "WALL";
-                   
-                       init(board[3][6]) := "NULL";
-                   
-                       init(board[3][7]) := "NULL";
-                   
-                       init(board[4][-2]) := "NULL";
-                   
-                       init(board[4][-1]) := "NULL";
-                   
-                       init(board[4][0]) := "FLOOR";
-                   
-                       init(board[4][1]) := "FLOOR";
-                   
-                       init(board[4][2]) := "FLOOR";
-                   
-                       init(board[4][3]) := "FLOOR";
-                   
-                       init(board[4][4]) := "FLOOR";
-                   
-                       init(board[4][5]) := "FLOOR";
-                   
-                       init(board[4][6]) := "NULL";
-                   
-                       init(board[4][7]) := "NULL";
-                   
-                       init(board[5][-2]) := "NULL";
-                   
-                       init(board[5][-1]) := "NULL";
-                   
-                       init(board[5][0]) := "NULL";
-                   
-                       init(board[5][1]) := "NULL";
-                   
-                       init(board[5][2]) := "NULL";
-                   
-                       init(board[5][3]) := "NULL";
-                   
-                       init(board[5][4]) := "NULL";
-                   
-                       init(board[5][5]) := "NULL";
-                   
-                       init(board[5][6]) := "NULL";
-                   
-                       init(board[5][7]) := "NULL";
-                   
-                       init(board[6][-2]) := "NULL";
-                   
-                       init(board[6][-1]) := "NULL";
-                   
-                       init(board[6][0]) := "NULL";
-                   
-                       init(board[6][1]) := "NULL";
-                   
-                       init(board[6][2]) := "NULL";
-                   
-                       init(board[6][3]) := "NULL";
-                   
-                       init(board[6][4]) := "NULL";
-                   
-                       init(board[6][5]) := "NULL";
-                   
-                       init(board[6][6]) := "NULL";
-                   
-                       init(board[6][7]) := "NULL";
-                   
-            next(keeper_x) := case
-                (action = u) & keeper_x > 0 & (board[keeper_x - 1][keeper_y] = FLOOR | board[keeper_x - 1][keeper_y] = GOAL): keeper_x - 1;
-                -- (action = u) & keeper_x > 1 & (board[keeper_x - 1][keeper_y] = "BOX" | board[keeper_x - 1][keeper_y] = "BOX_ON_GOAL") & (board[keeper_x - 2][keeper_y] = "FLOOR" | board[keeper_x - 2][keeper_y] = "GOAL") : keeper_x - 1
-                (action = d) & keeper_x < rows - 1 & (board[keeper_x + 1][keeper_y] = FLOOR | board[keeper_x + 1][keeper_y] = GOAL): keeper_x + 1;
-                -- (action = d) & keeper_x < rows - 2 & (board[keeper_x + 1][keeper_y] = "BOX" | board[keeper_x + 1][keeper_y] = "BOX_ON_GOAL") & (board[keeper_x + 2][keeper_y] = "FLOOR" | board[keeper_x + 2][keeper_y] =  "GOAL"): keeper_x + 1;
-                TRUE: keeper_x;
-
-
-            esac;
-
-            next(keeper_y) := case
-                (action = l) & keeper_y > 0 & (board[keeper_x][keeper_y - 1] = FLOOR | board[keeper_x][keeper_y - 1] = GOAL): keeper_y - 1;
-                -- (action = l) &  keeper_y > 1 & (board[keeper_x][keeper_y - 1] = "BOX" | board[keeper_x][keeper_y - 1] = "BOX_ON_GOAL") & (board[keeper_x][keeper_y - 2] = "FLOOR" | board[keeper_x][keeper_y - 2] = "GOAL"): keeper_y - 1;
-                (action = r) & keeper_y < columns - 1 & (board[keeper_x][keeper_y + 1] = FLOOR | board[keeper_x][keeper_y + 1] = GOAL): keeper_y + 1;
-                -- (action = r) & keeper_y < columns - 2 & (board[keeper_x][keeper_y + 1] = "BOX" | board[keeper_x][keeper_y + 1] =  "BOX_ON_GOAL") & (board[keeper_x][keeper_y + 2] = "FLOOR" | board[keeper_x][keeper_y + 2] = "GOAL") : keeper_y + 1;
-                TRUE: keeper_y;
-            esac;
-
-            next(board) :=
-                case
-                    (action = u) & keeper_x > 0 & (board[keeper_x - 1][keeper_y] = BOX | board[keeper_x - 1][keeper_y] = BOX_ON_GOAL) & (board[keeper_x - 2][keeper_y] = FLOOR | board[keeper_x - 2][keeper_y] = GOAL):
-                    (case
-                        board[keeper_x - 2][keeper_y] = FLOOR: (board[keeper_x - 2][keeper_y] := BOX; board[keeper_x - 1][keeper_y] := (board[keeper_x - 1][keeper_y] = BOX_ON_GOAL) ? KEEPER_ON_GOAL: KEEPER); board[keeper_x][keeper_y] := (board[keeper_x][keeper_y] = KEEPER_ON_GOAL) ? GOAL: FLOOR;
-                        board[keeper_x - 2][keeper_y] = GOAL: (board[keeper_x - 2][keeper_y] := BOX_ON_GOAL; board[keeper_x - 1][keeper_y] := (board[keeper_x - 1][keeper_y] = BOX_ON_GOAL) ? KEEPER_ON_GOAL: KEEPER); board[keeper_x][keeper_y] := (board[keeper_x][keeper_y] = KEEPER_ON_GOAL) ? GOAL: FLOOR;
-                        TRUE: board;
-                    esac);
-
-                    (action = d) & keeper_x < rows - 1 & (board[keeper_x + 1][keeper_y] = BOX | board[keeper_x + 1][keeper_y] = BOX_ON_GOAL) & (board[keeper_x + 2][keeper_y] = FLOOR | board[keeper_x + 2][keeper_y] = GOAL):
-                    (case
-                        board[keeper_x + 2][keeper_y] = FLOOR: (board[keeper_x + 2][keeper_y] := BOX; board[keeper_x + 1][keeper_y] := (board[keeper_x + 1][keeper_y] = BOX_ON_GOAL) ? KEEPER_ON_GOAL: KEEPER); board[keeper_x][keeper_y] := (board[keeper_x][keeper_y] = KEEPER_ON_GOAL) ? GOAL: FLOOR;
-                        board[keeper_x + 2][keeper_y] = GOAL: (board[keeper_x + 2][keeper_y] := BOX_ON_GOAL; board[keeper_x + 1][keeper_y] := (board[keeper_x + 1][keeper_y] = BOX_ON_GOAL) ? KEEPER_ON_GOAL: KEEPER); board[keeper_x][keeper_y] := (board[keeper_x][keeper_y] = KEEPER_ON_GOAL) ? GOAL: FLOOR;
-                        TRUE: board;
-                    esac);
-
-                    (action = l) & keeper_y > 0 & (board[keeper_x][keeper_y - 1] = BOX | board[keeper_x][keeper_y - 1] = BOX_ON_GOAL) & (board[keeper_x][keeper_y - 2] = FLOOR | board[keeper_x][keeper_y - 2] = GOAL):
-                    (case
-                        board[keeper_x][keeper_y - 2] = FLOOR: (board[keeper_x][keeper_y - 2] := BOX; board[keeper_x][keeper_y - 1] := (board[keeper_x][keeper_y - 1] = BOX_ON_GOAL) ? KEEPER_ON_GOAL: KEEPER); board[keeper_x][keeper_y] := (board[keeper_x][keeper_y] = KEEPER_ON_GOAL) ? GOAL: FLOOR;
-                        board[keeper_x][keeper_y - 2] = GOAL: (board[keeper_x][keeper_y - 2] := BOX_ON_GOAL; board[keeper_x][keeper_y - 1] := (board[keeper_x][keeper_y - 1] = BOX_ON_GOAL) ? KEEPER_ON_GOAL: KEEPER); board[keeper_x][keeper_y] := (board[keeper_x][keeper_y] = KEEPER_ON_GOAL) ? GOAL: FLOOR;
-                        TRUE: board;
-                    esac);
-
-                    (action = r) & keeper_y < columns - 1 & (board[keeper_x][keeper_y + 1] = BOX | board[keeper_x][keeper_y + 1] = BOX_ON_GOAL) & (board[keeper_x][keeper_y + 2] = FLOOR | board[keeper_x][keeper_y + 2] = GOAL):
-                    (case
-                        board[keeper_x][keeper_y + 2] = FLOOR: (board[keeper_x][keeper_y + 2] := BOX; board[keeper_x][keeper_y + 1] := (board[keeper_x][keeper_y + 1] = BOX_ON_GOAL) ? KEEPER_ON_GOAL: KEEPER); board[keeper_x][keeper_y] := (board[keeper_x][keeper_y] = KEEPER_ON_GOAL) ? GOAL: FLOOR;
-                        board[keeper_x][keeper_y + 2] = GOAL: (board[keeper_x][keeper_y + 2] := BOX_ON_GOAL; board[keeper_x][keeper_y + 1] := (board[keeper_x][keeper_y + 1] = BOX_ON_GOAL) ? KEEPER_ON_GOAL: KEEPER); board[keeper_x][keeper_y] := (board[keeper_x][keeper_y] = KEEPER_ON_GOAL) ? GOAL: FLOOR;
-                        TRUE: board;
-                    esac);
-                TRUE: board;
-            esac;
-
+    
+    ASSIGN 
+        init(wk_x) := 3;
+        init(wk_y) := 2;
+        init(action) := 0;
+        
+        init(box1_x) := 2;  
+        init(box1_y) := 2;
+        init(box1_on_goal) := FALSE; 
+        
+            init(walls[0][0]) := FALSE;
+            init(walls[0][1]) := FALSE;
+            init(walls[0][2]) := FALSE;
+            init(walls[0][3]) := FALSE;
+            init(walls[0][4]) := FALSE;
+            init(walls[0][5]) := FALSE;
+            init(walls[1][0]) := TRUE;
+            init(walls[1][1]) := FALSE;
+            init(walls[1][2]) := FALSE;
+            init(walls[1][3]) := FALSE;
+            init(walls[1][4]) := FALSE;
+            init(walls[1][5]) := TRUE;
+            init(walls[2][0]) := TRUE;
+            init(walls[2][1]) := FALSE;
+            init(walls[2][2]) := FALSE;
+            init(walls[2][3]) := FALSE;
+            init(walls[2][4]) := FALSE;
+            init(walls[2][5]) := TRUE;
+            init(walls[3][0]) := TRUE;
+            init(walls[3][1]) := FALSE;
+            init(walls[3][2]) := FALSE;
+            init(walls[3][3]) := TRUE;
+            init(walls[3][4]) := FALSE;
+            init(walls[3][5]) := TRUE;
+            init(walls[4][0]) := FALSE;
+            init(walls[4][1]) := FALSE;
+            init(walls[4][2]) := FALSE;
+            init(walls[4][3]) := FALSE;
+            init(walls[4][4]) := FALSE;
+            init(walls[4][5]) := FALSE;
+            init(goals[0][0]) := FALSE;
+            init(goals[0][1]) := FALSE;
+            init(goals[0][2]) := FALSE;
+            init(goals[0][3]) := FALSE;
+            init(goals[0][4]) := FALSE;
+            init(goals[0][5]) := FALSE;
+            init(goals[1][0]) := FALSE;
+            init(goals[1][1]) := FALSE;
+            init(goals[1][2]) := TRUE;
+            init(goals[1][3]) := FALSE;
+            init(goals[1][4]) := FALSE;
+            init(goals[1][5]) := FALSE;
+            init(goals[2][0]) := FALSE;
+            init(goals[2][1]) := FALSE;
+            init(goals[2][2]) := FALSE;
+            init(goals[2][3]) := FALSE;
+            init(goals[2][4]) := FALSE;
+            init(goals[2][5]) := FALSE;
+            init(goals[3][0]) := FALSE;
+            init(goals[3][1]) := FALSE;
+            init(goals[3][2]) := FALSE;
+            init(goals[3][3]) := FALSE;
+            init(goals[3][4]) := FALSE;
+            init(goals[3][5]) := FALSE;
+            init(goals[4][0]) := FALSE;
+            init(goals[4][1]) := FALSE;
+            init(goals[4][2]) := FALSE;
+            init(goals[4][3]) := FALSE;
+            init(goals[4][4]) := FALSE;
+            init(goals[4][5]) := FALSE;
+            init(floors[0][0]) := TRUE;
+            init(floors[0][1]) := TRUE;
+            init(floors[0][2]) := TRUE;
+            init(floors[0][3]) := TRUE;
+            init(floors[0][4]) := TRUE;
+            init(floors[0][5]) := TRUE;
+            init(floors[1][0]) := FALSE;
+            init(floors[1][1]) := TRUE;
+            init(floors[1][2]) := FALSE;
+            init(floors[1][3]) := TRUE;
+            init(floors[1][4]) := TRUE;
+            init(floors[1][5]) := FALSE;
+            init(floors[2][0]) := FALSE;
+            init(floors[2][1]) := TRUE;
+            init(floors[2][2]) := FALSE;
+            init(floors[2][3]) := TRUE;
+            init(floors[2][4]) := TRUE;
+            init(floors[2][5]) := FALSE;
+            init(floors[3][0]) := FALSE;
+            init(floors[3][1]) := TRUE;
+            init(floors[3][2]) := FALSE;
+            init(floors[3][3]) := FALSE;
+            init(floors[3][4]) := TRUE;
+            init(floors[3][5]) := FALSE;
+            init(floors[4][0]) := TRUE;
+            init(floors[4][1]) := TRUE;
+            init(floors[4][2]) := TRUE;
+            init(floors[4][3]) := TRUE;
+            init(floors[4][4]) := TRUE;
+            init(floors[4][5]) := TRUE;
+    next(walls) := walls;  -- Walls do not change
+    next(goals) := goals;  -- Goals do not change
+    next(floors) := floors;  -- Floors do not change
      
+     next(wk_x) := 
+            case
+                wk_x = 0 : wk_x;  -- Left edge
+                wk_x = 5 : wk_x;  -- Right edge
+               
+                action = left & !walls[wk_x - 1][wk_y] : wk_x - 1;   -- Can move right if no wall to the right
+                action = right & !walls[wk_x + 1][wk_y] : wk_x + 1;  -- Can move left if no wall to the left
+                            
+                TRUE : wk_x;  -- Default: stay in the same position if no valid move
+            esac;
+
+        next(wk_y) :=  
+            case
+                wk_y = 0 : wk_y;  -- Top edge
+                wk_y = 4 : wk_y;  -- Bottom edge     
+                         
+                action = up & !walls[wk_x][wk_y - 1] : wk_y - 1;  -- Can move up if no wall below
+                action = down & !walls[wk_x][wk_y + 1] : wk_y + 1;  -- Can move down if no wall above
+                
+                TRUE : wk_y;   -- Default: stay in the same position if no valid move
+            esac;
+    
+         next(box1_x) := 
+             case
+                 box1_x = 0 : box1_x;  -- Left edge
+                 box1_x = 5 : box1_x;  -- Right edge
+
+                 --action = left  & !walls[box1_x - 1][box1_y] & wk_x = box1_x + 1 & wk_y = box1_y : box1_x - 1;  -- Space to push
+                 --action = right  & !walls[box1_x + 1][box1_y] & wk_x = box1_x - 1 & wk_y = box1_y : box1_x + 1;  -- Space to push
+                 
+                action = left & (next(wk_x) = box1_x & next(wk_y) = box1_y) : box1_x - 1;  -- Warehouse keeper is pushing box 1
+                action = right & (next(wk_x) = box1_x & next(wk_y) = box1_y) : box1_x + 1;  -- Warehouse keeper is pushing box 1
+                 TRUE : box1_x;  -- Default: no movement
+             esac;
+
+         next(box1_y) := 
+             case
+                 box1_y = 0 : box1_y;  -- Top edge
+                 box1_y = 4 : box1_y;  -- Bottom edge 
+                 
+                 --action = down  & !walls[box1_x][box1_y + 1] & wk_x = box1_x & wk_y = box1_y - 1 : box1_y + 1;  -- Space to push
+                 --action = up  & !walls[box1_x][box1_y - 1] & wk_x = box1_x & wk_y = box1_y + 1 : box1_y - 1;  -- Space to push
+                 
+                action = down & (next(wk_x) = box1_x & next(wk_y) = box1_y) : box1_y + 1;  -- Warehouse keeper is pushing box 1
+                action = up & (next(wk_x) = box1_x & next(wk_y) = box1_y) : box1_y - 1;  -- Warehouse keeper is pushing box 1
+                
+                 TRUE : box1_y;  -- Default: no movement
+             esac;
+             
+        next(box1_on_goal) :=
+        case
+            goals[next(box1_x)][next(box1_y)] : TRUE;
+            TRUE : FALSE;  -- Default: not on goal
+        esac;
+        
+
+    TRANS
+       
+        next(action) = up | next(action) = down | next(action) = right | next(action) = left;  -- Non-deterministic choice of action
+ 
 
     SPEC
-    AG !(
-        
-    -- Win condition: all boxes are on goals
-
-     board[1][2] = "BOX_ON_GOAL" 
-    )
-
+       AG (!box1_on_goal)
     
