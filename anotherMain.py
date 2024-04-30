@@ -217,9 +217,10 @@ def generate_smv_win_spec(board_data):
 
 def main():
     xsb_board = '''
-@.
--$
---
+-----
+@----
+-$-#-
+---#.
 '''  # Example board
     # Example board
 #     xsb_board = """
