@@ -213,33 +213,37 @@ def generate_smv_win_spec(board_data, iterative=False):
             smv_win_spec += f''' LTLSPEC G(!( board[{goals[i][0]}][{goals[i][1]}] = "BOX_ON_GOAL" ))'''
     else:
         smv_win_spec = f'''LTLSPEC G(!( board[{goals[0][0]}][{goals[0][1]}] = "BOX_ON_GOAL" '''
-        for i in range(1, len(goals)):
-            smv_win_spec += f''' & board[{goals[i][0]}][{goals[i][1]}] = "BOX_ON_GOAL" ))'''
+        if len(goals) > 1:
+            for i in range(1, len(goals)):
+                smv_win_spec += f''' & board[{goals[i][0]}][{goals[i][1]}] = "BOX_ON_GOAL"'''
+        smv_win_spec += f''' ))'''
 
     return smv_win_spec
 
 
-def main():
-    xsb_board = '''
------
-@----
-$$-#-
-.--#.
-'''  # Example board
 
-    #     xsb_board = '''
-    # ----#####----------
-    # ----#---#----------
-    # ----#$--#----------
-    # --###--$##---------
-    # --#--$-$-#---------
-    # ###-#-##-#---######
-    # #---#-##-#####--..#
-    # #-$--$----------..#
-    # #####-###-#@##--..#
-    # ----#-----#########
-    # ----#######--------
-    # '''
+def main():
+#     xsb_board = '''
+# -----
+# @----
+# -$-#-
+# ---#.
+# '''
+    # Example board
+#
+#     xsb_board = '''
+#     ----#####----------
+#     ----#---#----------
+#     ----#$--#----------
+#     --###--$##---------
+#     --#--$-$-#---------
+#     ###-#-##-#---######
+#     #---#-##-#####--..#
+#     #-$--$----------..#
+#     #####-###-#@##--..#
+#     ----#-----#########
+#     ----#######--------
+#     '''
     #     Example board
     xsb_board = """
 -..
