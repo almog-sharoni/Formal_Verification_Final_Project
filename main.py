@@ -5,6 +5,9 @@ def generate_smv_file():
     # Run the Python script to generate the SMV file
     subprocess.run(["python", "generate_sokoban_smv.py"])
 
+def generate_iterative_smv_file():
+    # Run the Python script to generate the SMV file
+    subprocess.run(["python", "generate_skoboan_iterative_smv.py"])
 def generate_actions_file():
     # Run the Python script to generate the actions file
     subprocess.run(["python", "movesGen.py"])
@@ -20,11 +23,17 @@ def run_nusmv(file_path, output_file):
 
 
 
+
 if __name__ == "__main__":
     # Generate the SMV file
     generate_smv_file()
-
-    smv_file_path = "sokoban.smv"
     execution_time = run_nusmv("commands_list.sh", "moves.txt")
+    # #
+
+
+    # generate_iterative_smv_file()
+    # execution_time = run_nusmv("commands_list_iterative.sh", "moves.txt")
+
+
     generate_actions_file()
     print("NuSMV Execution Time:", execution_time, "seconds")

@@ -14,13 +14,9 @@
 *** Copyright (c) 2003-2006, Niklas Een, Niklas Sorensson
 *** Copyright (c) 2007-2010, Niklas Sorensson
 
--- no counterexample found with bound 0
--- no counterexample found with bound 1
--- no counterexample found with bound 2
--- no counterexample found with bound 3
--- specification  G !(board[0][1] = "BOX_ON_GOAL" & board[0][2] = "BOX_ON_GOAL")    is false
+-- specification  G !(board[0][1] = "BOX_ON_GOAL" & board[0][2] = "BOX_ON_GOAL")  is false
 -- as demonstrated by the following execution sequence
-Trace Description: BMC Counterexample 
+Trace Description: LTL Counterexample 
 Trace Type: Counterexample 
   -> State: 1.1 <-
     board[-2][-2] = "NULL"
@@ -97,3 +93,9 @@ Trace Type: Counterexample
     board[1][2] = "KEEPER"
     board[2][2] = "FLOOR"
     action = u
+  -- Loop starts here
+  -> State: 1.6 <-
+    board[1][2] = "FLOOR"
+    board[2][2] = "KEEPER"
+    action = d
+  -> State: 1.7 <-
