@@ -33,32 +33,17 @@ def generate_smv_define(board):
     smv_define = f'''
         rows := {len(board)};
         columns := {len(board[0])};
-        rows_minus_one := rows - 1;
-        columns_minus_one := columns - 1;
-
         '''
 
     return smv_define
 
 
 def generate_smv_var(board):
-    rows = len(board)
-    columns = len(board[0])
-
-    # print("rows: ", rows)
-    # print("columns: ", columns)
-
     smv_var = f'''
-        -- Cell: {{"KEEPER", "BOX", "GOAL", "KEEPER_ON_GOAL", "BOX_ON_GOAL", "WALL", "FLOOR", "NULL"}};
-
-        -- board : array -2..rows+1 of array -2..columns+1 of Cell;
-
-        -- board : array 0..{rows - 1} of array 0..{columns - 1} of {{"KEEPER", "BOX", "GOAL", "KEEPER_ON_GOAL", "#", "FLOOR", "BOX_ON_GOAL"}}; 
+    
         board : array -2..rows+1 of array -2..columns+1 of {{"KEEPER", "BOX", "GOAL", "KEEPER_ON_GOAL","WALL" , "FLOOR", "BOX_ON_GOAL", "NULL"}};  
 
         action : {{u, d, l, r, 0}};  
-
-        box_on_goal : boolean;
 
     '''
 
@@ -99,13 +84,6 @@ def generate_smv_state(board):
 
         -- dont need to refer the borders as we have walls
         next(action) := {{u, d, l, r}};
-
-        next(box_on_goal) := case
-            board[{goals[0][0]}][{goals[0][1]}] = "BOX_ON_GOAL" : TRUE;
-            TRUE : FALSE;
-        esac;
-
-
 
         '''
 
@@ -160,10 +138,10 @@ def generate_smv_state(board):
 
                 board[{x}][{y}] = "GOAL":
                     case
-                        (board[{x + 1}][{y}] = "KEEPER" | board[{x + 1}][{y}] = "KEEPER_ON_GOAL") & next(action) = u : "GOAL";--logic problem was here!
-                        (board[{x - 1}][{y}] = "KEEPER" | board[{x - 1}][{y}] = "KEEPER_ON_GOAL") & next(action) = d : "GOAL";--logic problem was here!
-                        (board[{x}][{y + 1}] = "KEEPER" | board[{x}][{y + 1}] = "KEEPER_ON_GOAL") & next(action) = l : "GOAL";--logic problem was here!
-                        (board[{x}][{y - 1}] = "KEEPER" | board[{x}][{y - 1}] = "KEEPER_ON_GOAL") & next(action) = r : "GOAL"; --logic problem was here!
+                        (board[{x + 1}][{y}] = "KEEPER" | board[{x + 1}][{y}] = "KEEPER_ON_GOAL") & next(action) = u : "KEEPER_ON_GOAL";--logic problem was here!
+                        (board[{x - 1}][{y}] = "KEEPER" | board[{x - 1}][{y}] = "KEEPER_ON_GOAL") & next(action) = d : "KEEPER_ON_GOAL";--logic problem was here!
+                        (board[{x}][{y + 1}] = "KEEPER" | board[{x}][{y + 1}] = "KEEPER_ON_GOAL") & next(action) = l : "KEEPER_ON_GOAL";--logic problem was here!
+                        (board[{x}][{y - 1}] = "KEEPER" | board[{x}][{y - 1}] = "KEEPER_ON_GOAL") & next(action) = r : "KEEPER_ON_GOAL"; --logic problem was here!
                         (board[{x + 2}][{y}] = "KEEPER" | board[{x + 2}][{y}] = "KEEPER_ON_GOAL") & (board[{x + 1}][{y}] = "BOX" | board[{x + 1}][{y}] = "BOX_ON_GOAL") & next(action) = u : "BOX_ON_GOAL";
                         (board[{x - 2}][{y}] = "KEEPER" | board[{x - 2}][{y}] = "KEEPER_ON_GOAL") & (board[{x - 1}][{y}] = "BOX" | board[{x - 1}][{y}] = "BOX_ON_GOAL") & next(action) = d : "BOX_ON_GOAL";
                         (board[{x}][{y + 2}] = "KEEPER" | board[{x}][{y + 2}] = "KEEPER_ON_GOAL") & (board[{x}][{y + 1}] = "BOX" | board[{x}][{y + 1}] = "BOX_ON_GOAL") & next(action) = l : "BOX_ON_GOAL";
@@ -221,15 +199,16 @@ def generate_smv_win_spec(board_data, iterative=False):
 
     return smv_win_spec, goals
 
+def read_board_from_file(file_path):
+    with open(file_path, 'r') as file:
+        xsb_board = file.read()
+    return xsb_board
 
 def main():
-    xsb_board = """
--..
--$$
--@-
-"""
-
+    xsb_board = read_board_from_file("board3.txt")
+    print(xsb_board)
     board_data = parse_board(xsb_board)
+    print(board_data)
     initial_board = board_data
     smv_model = f'''
     MODULE main 
