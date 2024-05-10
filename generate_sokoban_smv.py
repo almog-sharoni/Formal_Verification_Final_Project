@@ -5,6 +5,9 @@
 # # - wall
 # . - goal
 # - - floor
+import sys
+
+
 def parse_board(xsb_input):
     board_array = []
     for row in xsb_input.strip().splitlines():
@@ -174,7 +177,7 @@ def generate_smv_state(board):
 
 
 
-def generate_smv_win_spec(board_data, iterative=False):
+def generate_smv_win_spec(board_data, iterative=0, iterative_num=0):
     # save goals locations in array to use it in the win condition
     goals = []
     for x in range(len(board_data)):
@@ -183,10 +186,13 @@ def generate_smv_win_spec(board_data, iterative=False):
                 goals.append((x, y))
                 # print("goal: ", goals)
 
-    if iterative:
-        smv_win_spec = f'''LTLSPEC G(!( board[{goals[0][0]}][{goals[0][1]}] = "BOX_ON_GOAL" )) '''
-        for i in range(1, len(goals)):
-            smv_win_spec += f''' LTLSPEC G(!( board[{goals[i][0]}][{goals[i][1]}] = "BOX_ON_GOAL" ))'''
+    if iterative == 1:
+        smv_win_spec = f'''LTLSPEC G(!( board[{goals[0][0]}][{goals[0][1]}] = "BOX_ON_GOAL" '''
+        if iterative_num > 1:
+            for i in range(1, iterative_num):
+                smv_win_spec += f''' & board[{goals[i][0]}][{goals[i][1]}] = "BOX_ON_GOAL"'''
+        smv_win_spec += f''' ))'''
+
     else:
         smv_win_spec = f'''LTLSPEC G(!( board[{goals[0][0]}][{goals[0][1]}] = "BOX_ON_GOAL" '''
         if len(goals) > 1:
@@ -201,9 +207,9 @@ def read_board_from_file(file_path):
         xsb_board = file.read()
     return xsb_board
 
-def main():
+def main(iterative, iterative_num, board_file):
 
-    xsb_board = read_board_from_file("board3.txt")
+    xsb_board = read_board_from_file(board_file)
     print(xsb_board)
     board_data = parse_board(xsb_board)
     print(board_data)
@@ -219,7 +225,7 @@ def main():
         {generate_smv_state(board_data)} 
 
     
-        {generate_smv_win_spec(initial_board)}
+        {generate_smv_win_spec(initial_board, iterative, iterative_num)}
 
     '''
 
@@ -228,4 +234,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) != 4:
+        print("Usage: python generate_skoboan_smv.py param1 param2 param3")
+        sys.exit(1)
+    iterative = sys.argv[1]
+    index = sys.argv[2]
+    board_file = sys.argv[3]
+    main(int(iterative), int(index), board_file)

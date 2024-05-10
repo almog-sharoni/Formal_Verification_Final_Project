@@ -1,7 +1,7 @@
 read_model -i sokoban.smv
 # BDD solver
 #go
-c#heck_ltlspec
+#check_ltlspec
 
 # SAT solver
 go_bmc
