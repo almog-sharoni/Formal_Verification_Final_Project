@@ -8,6 +8,3 @@ check_ltlspec
 #check_ltlspec_bmc -k 100
 
 quit
-
-
-

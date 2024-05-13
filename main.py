@@ -12,7 +12,7 @@ def iterative_solution(board_file):
     subprocess.run(["python", "generate_skoboan_iterative_smv.py", board_file])
 
 def generate_actions_file():
-    subprocess.run(["python", "movesGen.py"])
+    subprocess.run(["python", "movesPrinter.py"])
 
 def run_nuXmv(file_path, output_file):
     with open(output_file, 'w') as f:
