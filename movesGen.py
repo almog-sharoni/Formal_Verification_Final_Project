@@ -40,4 +40,7 @@ def file_to_states(file):
 
 
 if __name__ == '__main__':
-    file_to_states('moves.txt')
+    try:
+        file_to_states('moves.txt')
+    except Exception as e:
+        print("no routes found")

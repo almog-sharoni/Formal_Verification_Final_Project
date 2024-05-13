@@ -21,18 +21,16 @@ def read_board_into_file(i):
         lines = file.readlines()
         for line in lines:
             if "rows" in line:
-                rows = int(line[11])
+                rows = int(line[11:])
             if "columns" in line:
-                columns = int(line[14])
-        print(rows, columns)
+                columns = int(line[14:])
         board = [[0 for _ in range(columns)] for _ in range(rows)]
-
     start_processing = False
+
     with open("moves.txt", "r") as file:
         lines = file.readlines()
         for line in lines:
             if "specification" in line:
-                # Set flag to True when the line containing "specification" is found
                 start_processing = True
                 continue  # Skip processing this line
             if start_processing:
@@ -51,7 +49,6 @@ def read_board_into_file(i):
                 if "FLOOR" in line:
                     board[int(line[10])][int(line[13])] = '-'
 
-    # open new file to write
     with open(f"board_iterative{i}.txt", "w") as file:
         for row in board:
             for cell in row:
@@ -60,7 +57,7 @@ def read_board_into_file(i):
 
     return "board_iterative" + str(i) + ".txt"
 
-def goals_locations(board_file):
+def goals_number(board_file):
     goals = []
     with open(board_file, "r") as file:
         # Iterate over each line in the file
@@ -74,7 +71,7 @@ def goals_locations(board_file):
     return len(goals)
 
 def generate_iterative_smv_files(board_file):
-    numbers_of_goals = goals_locations(board_file)
+    numbers_of_goals = goals_number(board_file)
     iterative = str(1)
     index = str(1)
     total_execution_time = 0
@@ -82,6 +79,7 @@ def generate_iterative_smv_files(board_file):
         # Run the Python script to generate the SMV file
         subprocess.run(["python", "generate_sokoban_smv.py", iterative, index, board_file])
         execution_time = run_nuXmv("commands_list.sh", "moves.txt")
+        print()
         print("NuXmv Execution Time for board_iterative" + str(i) + ".txt:", execution_time, "seconds")
         generate_actions_file()
         board_file = read_board_into_file(int(index))
@@ -90,13 +88,14 @@ def generate_iterative_smv_files(board_file):
         total_execution_time += execution_time
         print("****************************************************")
         print("****************************************************")
+        print()
         index = str(int(index) + 1)
 
     print("Total Execution Time:", total_execution_time, "seconds")
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python generate_skoboan_iterative_smv.py param1")
+        print("Usage: python generate_sokoban_iterative_smv.py param1")
         sys.exit(1)
     board_file = sys.argv[1]
     generate_iterative_smv_files(board_file)

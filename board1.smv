@@ -158,27 +158,27 @@
             case
                 board[0][0] = "KEEPER_ON_GOAL": 
                     case
-                        board[1][0] = "FLOOR" & next(action) = d : "GOAL";
-                        board[-1][0] = "FLOOR" & next(action) = u : "GOAL";
-                        board[0][1] = "FLOOR" & next(action) = r : "GOAL";
-                        board[0][-1] = "FLOOR" & next(action) = l : "GOAL";
-                        board[1][0] = "BOX" & (board[2][0] = "FLOOR" | board[2][0] = "GOAL") & next(action) = d : "GOAL";
-                        board[-1][0] = "BOX" & (board[-2][0] = "FLOOR" | board[-2][0] = "GOAL") & next(action) = u : "GOAL";
-                        board[0][1] = "BOX" & (board[0][2] = "FLOOR" | board[0][2] = "GOAL") & next(action) = r : "GOAL";
-                        board[0][-1] = "BOX" & (board[0][-2] = "FLOOR" | board[0][-2] = "GOAL") & next(action) = l : "GOAL";
+                        (board[1][0] = "FLOOR" | board[1][0] = "GOAL") & next(action) = d : "GOAL";
+                        (board[-1][0] = "FLOOR" | board[-1][0] = "GOAL") & next(action) = u : "GOAL";
+                        (board[0][1] = "FLOOR" | board[0][1] = "GOAL") & next(action) = r : "GOAL";
+                        (board[0][-1] = "FLOOR" | board[0][-1] = "GOAL") & next(action) = l : "GOAL";
+                        (board[1][0] = "BOX" | board[1][0] = "BOX_ON_GOAL") & (board[2][0] = "FLOOR" | board[2][0] = "GOAL") & next(action) = d : "GOAL";
+                        (board[-1][0] = "BOX" | board[-1][0] = "BOX_ON_GOAL") & (board[-2][0] = "FLOOR" | board[-2][0] = "GOAL") & next(action) = u : "GOAL";
+                        (board[0][1] = "BOX" | board[0][1] = "BOX_ON_GOAL") & (board[0][2] = "FLOOR" | board[0][2] = "GOAL") & next(action) = r : "GOAL";
+                        (board[0][-1] = "BOX" | board[0][-1] = "BOX_ON_GOAL") & (board[0][-2] = "FLOOR" | board[0][-2] = "GOAL") & next(action) = l : "GOAL";
                         TRUE : "KEEPER_ON_GOAL";
                     esac;
 
                 board[0][0] = "KEEPER":
                     case
-                        board[1][0] = "FLOOR" & next(action) = d : "FLOOR";
-                        board[-1][0] = "FLOOR" & next(action) = u : "FLOOR";
-                        board[0][1] = "FLOOR" & next(action) = r : "FLOOR";
-                        board[0][-1] = "FLOOR" & next(action) = l : "FLOOR";
-                        board[1][0] = "BOX" & (board[2][0] = "FLOOR" | board[2][0] = "GOAL") & next(action) = d : "FLOOR";
-                        board[-1][0] = "BOX" & (board[-2][0] = "FLOOR" | board[-2][0] = "GOAL") & next(action) = u : "FLOOR";
-                        board[0][1] = "BOX" & (board[0][2] = "FLOOR" | board[0][2] = "GOAL") & next(action) = r : "FLOOR";
-                        board[0][-1] = "BOX" & (board[0][-2] = "FLOOR" | board[0][-2] = "GOAL") & next(action) = l : "FLOOR";
+                        (board[1][0] = "FLOOR" | board[1][0] = "GOAL") & next(action) = d : "FLOOR";
+                        (board[-1][0] = "FLOOR" | board[-1][0] = "GOAL") & next(action) = u : "FLOOR";
+                        (board[0][1] = "FLOOR" | board[0][1] = "GOAL") & next(action) = r : "FLOOR";
+                        (board[0][-1] = "FLOOR" | board[0][-1] = "GOAL") & next(action) = l : "FLOOR";
+                        (board[1][0] = "BOX" | board[1][0] = "BOX_ON_GOAL") & (board[2][0] = "FLOOR" | board[2][0] = "GOAL") & next(action) = d : "FLOOR";
+                        (board[-1][0] = "BOX" | board[-1][0] = "BOX_ON_GOAL") & (board[-2][0] = "FLOOR" | board[-2][0] = "GOAL") & next(action) = u : "FLOOR";
+                        (board[0][1] = "BOX" | board[0][1] = "BOX_ON_GOAL") & (board[0][2] = "FLOOR" | board[0][2] = "GOAL") & next(action) = r : "FLOOR";
+                        (board[0][-1] = "BOX" | board[0][-1] = "BOX_ON_GOAL") & (board[0][-2] = "FLOOR" | board[0][-2] = "GOAL") & next(action) = l : "FLOOR";
                         TRUE : "KEEPER";
                     esac;
 
@@ -235,27 +235,27 @@
             case
                 board[0][1] = "KEEPER_ON_GOAL": 
                     case
-                        board[1][1] = "FLOOR" & next(action) = d : "GOAL";
-                        board[-1][1] = "FLOOR" & next(action) = u : "GOAL";
-                        board[0][2] = "FLOOR" & next(action) = r : "GOAL";
-                        board[0][0] = "FLOOR" & next(action) = l : "GOAL";
-                        board[1][1] = "BOX" & (board[2][1] = "FLOOR" | board[2][1] = "GOAL") & next(action) = d : "GOAL";
-                        board[-1][1] = "BOX" & (board[-2][1] = "FLOOR" | board[-2][1] = "GOAL") & next(action) = u : "GOAL";
-                        board[0][2] = "BOX" & (board[0][3] = "FLOOR" | board[0][3] = "GOAL") & next(action) = r : "GOAL";
-                        board[0][0] = "BOX" & (board[0][-1] = "FLOOR" | board[0][-1] = "GOAL") & next(action) = l : "GOAL";
+                        (board[1][1] = "FLOOR" | board[1][1] = "GOAL") & next(action) = d : "GOAL";
+                        (board[-1][1] = "FLOOR" | board[-1][1] = "GOAL") & next(action) = u : "GOAL";
+                        (board[0][2] = "FLOOR" | board[0][2] = "GOAL") & next(action) = r : "GOAL";
+                        (board[0][0] = "FLOOR" | board[0][0] = "GOAL") & next(action) = l : "GOAL";
+                        (board[1][1] = "BOX" | board[1][1] = "BOX_ON_GOAL") & (board[2][1] = "FLOOR" | board[2][1] = "GOAL") & next(action) = d : "GOAL";
+                        (board[-1][1] = "BOX" | board[-1][1] = "BOX_ON_GOAL") & (board[-2][1] = "FLOOR" | board[-2][1] = "GOAL") & next(action) = u : "GOAL";
+                        (board[0][2] = "BOX" | board[0][2] = "BOX_ON_GOAL") & (board[0][3] = "FLOOR" | board[0][3] = "GOAL") & next(action) = r : "GOAL";
+                        (board[0][0] = "BOX" | board[0][0] = "BOX_ON_GOAL") & (board[0][-1] = "FLOOR" | board[0][-1] = "GOAL") & next(action) = l : "GOAL";
                         TRUE : "KEEPER_ON_GOAL";
                     esac;
 
                 board[0][1] = "KEEPER":
                     case
-                        board[1][1] = "FLOOR" & next(action) = d : "FLOOR";
-                        board[-1][1] = "FLOOR" & next(action) = u : "FLOOR";
-                        board[0][2] = "FLOOR" & next(action) = r : "FLOOR";
-                        board[0][0] = "FLOOR" & next(action) = l : "FLOOR";
-                        board[1][1] = "BOX" & (board[2][1] = "FLOOR" | board[2][1] = "GOAL") & next(action) = d : "FLOOR";
-                        board[-1][1] = "BOX" & (board[-2][1] = "FLOOR" | board[-2][1] = "GOAL") & next(action) = u : "FLOOR";
-                        board[0][2] = "BOX" & (board[0][3] = "FLOOR" | board[0][3] = "GOAL") & next(action) = r : "FLOOR";
-                        board[0][0] = "BOX" & (board[0][-1] = "FLOOR" | board[0][-1] = "GOAL") & next(action) = l : "FLOOR";
+                        (board[1][1] = "FLOOR" | board[1][1] = "GOAL") & next(action) = d : "FLOOR";
+                        (board[-1][1] = "FLOOR" | board[-1][1] = "GOAL") & next(action) = u : "FLOOR";
+                        (board[0][2] = "FLOOR" | board[0][2] = "GOAL") & next(action) = r : "FLOOR";
+                        (board[0][0] = "FLOOR" | board[0][0] = "GOAL") & next(action) = l : "FLOOR";
+                        (board[1][1] = "BOX" | board[1][1] = "BOX_ON_GOAL") & (board[2][1] = "FLOOR" | board[2][1] = "GOAL") & next(action) = d : "FLOOR";
+                        (board[-1][1] = "BOX" | board[-1][1] = "BOX_ON_GOAL") & (board[-2][1] = "FLOOR" | board[-2][1] = "GOAL") & next(action) = u : "FLOOR";
+                        (board[0][2] = "BOX" | board[0][2] = "BOX_ON_GOAL") & (board[0][3] = "FLOOR" | board[0][3] = "GOAL") & next(action) = r : "FLOOR";
+                        (board[0][0] = "BOX" | board[0][0] = "BOX_ON_GOAL") & (board[0][-1] = "FLOOR" | board[0][-1] = "GOAL") & next(action) = l : "FLOOR";
                         TRUE : "KEEPER";
                     esac;
 
@@ -312,27 +312,27 @@
             case
                 board[0][2] = "KEEPER_ON_GOAL": 
                     case
-                        board[1][2] = "FLOOR" & next(action) = d : "GOAL";
-                        board[-1][2] = "FLOOR" & next(action) = u : "GOAL";
-                        board[0][3] = "FLOOR" & next(action) = r : "GOAL";
-                        board[0][1] = "FLOOR" & next(action) = l : "GOAL";
-                        board[1][2] = "BOX" & (board[2][2] = "FLOOR" | board[2][2] = "GOAL") & next(action) = d : "GOAL";
-                        board[-1][2] = "BOX" & (board[-2][2] = "FLOOR" | board[-2][2] = "GOAL") & next(action) = u : "GOAL";
-                        board[0][3] = "BOX" & (board[0][4] = "FLOOR" | board[0][4] = "GOAL") & next(action) = r : "GOAL";
-                        board[0][1] = "BOX" & (board[0][0] = "FLOOR" | board[0][0] = "GOAL") & next(action) = l : "GOAL";
+                        (board[1][2] = "FLOOR" | board[1][2] = "GOAL") & next(action) = d : "GOAL";
+                        (board[-1][2] = "FLOOR" | board[-1][2] = "GOAL") & next(action) = u : "GOAL";
+                        (board[0][3] = "FLOOR" | board[0][3] = "GOAL") & next(action) = r : "GOAL";
+                        (board[0][1] = "FLOOR" | board[0][1] = "GOAL") & next(action) = l : "GOAL";
+                        (board[1][2] = "BOX" | board[1][2] = "BOX_ON_GOAL") & (board[2][2] = "FLOOR" | board[2][2] = "GOAL") & next(action) = d : "GOAL";
+                        (board[-1][2] = "BOX" | board[-1][2] = "BOX_ON_GOAL") & (board[-2][2] = "FLOOR" | board[-2][2] = "GOAL") & next(action) = u : "GOAL";
+                        (board[0][3] = "BOX" | board[0][3] = "BOX_ON_GOAL") & (board[0][4] = "FLOOR" | board[0][4] = "GOAL") & next(action) = r : "GOAL";
+                        (board[0][1] = "BOX" | board[0][1] = "BOX_ON_GOAL") & (board[0][0] = "FLOOR" | board[0][0] = "GOAL") & next(action) = l : "GOAL";
                         TRUE : "KEEPER_ON_GOAL";
                     esac;
 
                 board[0][2] = "KEEPER":
                     case
-                        board[1][2] = "FLOOR" & next(action) = d : "FLOOR";
-                        board[-1][2] = "FLOOR" & next(action) = u : "FLOOR";
-                        board[0][3] = "FLOOR" & next(action) = r : "FLOOR";
-                        board[0][1] = "FLOOR" & next(action) = l : "FLOOR";
-                        board[1][2] = "BOX" & (board[2][2] = "FLOOR" | board[2][2] = "GOAL") & next(action) = d : "FLOOR";
-                        board[-1][2] = "BOX" & (board[-2][2] = "FLOOR" | board[-2][2] = "GOAL") & next(action) = u : "FLOOR";
-                        board[0][3] = "BOX" & (board[0][4] = "FLOOR" | board[0][4] = "GOAL") & next(action) = r : "FLOOR";
-                        board[0][1] = "BOX" & (board[0][0] = "FLOOR" | board[0][0] = "GOAL") & next(action) = l : "FLOOR";
+                        (board[1][2] = "FLOOR" | board[1][2] = "GOAL") & next(action) = d : "FLOOR";
+                        (board[-1][2] = "FLOOR" | board[-1][2] = "GOAL") & next(action) = u : "FLOOR";
+                        (board[0][3] = "FLOOR" | board[0][3] = "GOAL") & next(action) = r : "FLOOR";
+                        (board[0][1] = "FLOOR" | board[0][1] = "GOAL") & next(action) = l : "FLOOR";
+                        (board[1][2] = "BOX" | board[1][2] = "BOX_ON_GOAL") & (board[2][2] = "FLOOR" | board[2][2] = "GOAL") & next(action) = d : "FLOOR";
+                        (board[-1][2] = "BOX" | board[-1][2] = "BOX_ON_GOAL") & (board[-2][2] = "FLOOR" | board[-2][2] = "GOAL") & next(action) = u : "FLOOR";
+                        (board[0][3] = "BOX" | board[0][3] = "BOX_ON_GOAL") & (board[0][4] = "FLOOR" | board[0][4] = "GOAL") & next(action) = r : "FLOOR";
+                        (board[0][1] = "BOX" | board[0][1] = "BOX_ON_GOAL") & (board[0][0] = "FLOOR" | board[0][0] = "GOAL") & next(action) = l : "FLOOR";
                         TRUE : "KEEPER";
                     esac;
 
@@ -397,27 +397,27 @@
             case
                 board[1][0] = "KEEPER_ON_GOAL": 
                     case
-                        board[2][0] = "FLOOR" & next(action) = d : "GOAL";
-                        board[0][0] = "FLOOR" & next(action) = u : "GOAL";
-                        board[1][1] = "FLOOR" & next(action) = r : "GOAL";
-                        board[1][-1] = "FLOOR" & next(action) = l : "GOAL";
-                        board[2][0] = "BOX" & (board[3][0] = "FLOOR" | board[3][0] = "GOAL") & next(action) = d : "GOAL";
-                        board[0][0] = "BOX" & (board[-1][0] = "FLOOR" | board[-1][0] = "GOAL") & next(action) = u : "GOAL";
-                        board[1][1] = "BOX" & (board[1][2] = "FLOOR" | board[1][2] = "GOAL") & next(action) = r : "GOAL";
-                        board[1][-1] = "BOX" & (board[1][-2] = "FLOOR" | board[1][-2] = "GOAL") & next(action) = l : "GOAL";
+                        (board[2][0] = "FLOOR" | board[2][0] = "GOAL") & next(action) = d : "GOAL";
+                        (board[0][0] = "FLOOR" | board[0][0] = "GOAL") & next(action) = u : "GOAL";
+                        (board[1][1] = "FLOOR" | board[1][1] = "GOAL") & next(action) = r : "GOAL";
+                        (board[1][-1] = "FLOOR" | board[1][-1] = "GOAL") & next(action) = l : "GOAL";
+                        (board[2][0] = "BOX" | board[2][0] = "BOX_ON_GOAL") & (board[3][0] = "FLOOR" | board[3][0] = "GOAL") & next(action) = d : "GOAL";
+                        (board[0][0] = "BOX" | board[0][0] = "BOX_ON_GOAL") & (board[-1][0] = "FLOOR" | board[-1][0] = "GOAL") & next(action) = u : "GOAL";
+                        (board[1][1] = "BOX" | board[1][1] = "BOX_ON_GOAL") & (board[1][2] = "FLOOR" | board[1][2] = "GOAL") & next(action) = r : "GOAL";
+                        (board[1][-1] = "BOX" | board[1][-1] = "BOX_ON_GOAL") & (board[1][-2] = "FLOOR" | board[1][-2] = "GOAL") & next(action) = l : "GOAL";
                         TRUE : "KEEPER_ON_GOAL";
                     esac;
 
                 board[1][0] = "KEEPER":
                     case
-                        board[2][0] = "FLOOR" & next(action) = d : "FLOOR";
-                        board[0][0] = "FLOOR" & next(action) = u : "FLOOR";
-                        board[1][1] = "FLOOR" & next(action) = r : "FLOOR";
-                        board[1][-1] = "FLOOR" & next(action) = l : "FLOOR";
-                        board[2][0] = "BOX" & (board[3][0] = "FLOOR" | board[3][0] = "GOAL") & next(action) = d : "FLOOR";
-                        board[0][0] = "BOX" & (board[-1][0] = "FLOOR" | board[-1][0] = "GOAL") & next(action) = u : "FLOOR";
-                        board[1][1] = "BOX" & (board[1][2] = "FLOOR" | board[1][2] = "GOAL") & next(action) = r : "FLOOR";
-                        board[1][-1] = "BOX" & (board[1][-2] = "FLOOR" | board[1][-2] = "GOAL") & next(action) = l : "FLOOR";
+                        (board[2][0] = "FLOOR" | board[2][0] = "GOAL") & next(action) = d : "FLOOR";
+                        (board[0][0] = "FLOOR" | board[0][0] = "GOAL") & next(action) = u : "FLOOR";
+                        (board[1][1] = "FLOOR" | board[1][1] = "GOAL") & next(action) = r : "FLOOR";
+                        (board[1][-1] = "FLOOR" | board[1][-1] = "GOAL") & next(action) = l : "FLOOR";
+                        (board[2][0] = "BOX" | board[2][0] = "BOX_ON_GOAL") & (board[3][0] = "FLOOR" | board[3][0] = "GOAL") & next(action) = d : "FLOOR";
+                        (board[0][0] = "BOX" | board[0][0] = "BOX_ON_GOAL") & (board[-1][0] = "FLOOR" | board[-1][0] = "GOAL") & next(action) = u : "FLOOR";
+                        (board[1][1] = "BOX" | board[1][1] = "BOX_ON_GOAL") & (board[1][2] = "FLOOR" | board[1][2] = "GOAL") & next(action) = r : "FLOOR";
+                        (board[1][-1] = "BOX" | board[1][-1] = "BOX_ON_GOAL") & (board[1][-2] = "FLOOR" | board[1][-2] = "GOAL") & next(action) = l : "FLOOR";
                         TRUE : "KEEPER";
                     esac;
 
@@ -474,27 +474,27 @@
             case
                 board[1][1] = "KEEPER_ON_GOAL": 
                     case
-                        board[2][1] = "FLOOR" & next(action) = d : "GOAL";
-                        board[0][1] = "FLOOR" & next(action) = u : "GOAL";
-                        board[1][2] = "FLOOR" & next(action) = r : "GOAL";
-                        board[1][0] = "FLOOR" & next(action) = l : "GOAL";
-                        board[2][1] = "BOX" & (board[3][1] = "FLOOR" | board[3][1] = "GOAL") & next(action) = d : "GOAL";
-                        board[0][1] = "BOX" & (board[-1][1] = "FLOOR" | board[-1][1] = "GOAL") & next(action) = u : "GOAL";
-                        board[1][2] = "BOX" & (board[1][3] = "FLOOR" | board[1][3] = "GOAL") & next(action) = r : "GOAL";
-                        board[1][0] = "BOX" & (board[1][-1] = "FLOOR" | board[1][-1] = "GOAL") & next(action) = l : "GOAL";
+                        (board[2][1] = "FLOOR" | board[2][1] = "GOAL") & next(action) = d : "GOAL";
+                        (board[0][1] = "FLOOR" | board[0][1] = "GOAL") & next(action) = u : "GOAL";
+                        (board[1][2] = "FLOOR" | board[1][2] = "GOAL") & next(action) = r : "GOAL";
+                        (board[1][0] = "FLOOR" | board[1][0] = "GOAL") & next(action) = l : "GOAL";
+                        (board[2][1] = "BOX" | board[2][1] = "BOX_ON_GOAL") & (board[3][1] = "FLOOR" | board[3][1] = "GOAL") & next(action) = d : "GOAL";
+                        (board[0][1] = "BOX" | board[0][1] = "BOX_ON_GOAL") & (board[-1][1] = "FLOOR" | board[-1][1] = "GOAL") & next(action) = u : "GOAL";
+                        (board[1][2] = "BOX" | board[1][2] = "BOX_ON_GOAL") & (board[1][3] = "FLOOR" | board[1][3] = "GOAL") & next(action) = r : "GOAL";
+                        (board[1][0] = "BOX" | board[1][0] = "BOX_ON_GOAL") & (board[1][-1] = "FLOOR" | board[1][-1] = "GOAL") & next(action) = l : "GOAL";
                         TRUE : "KEEPER_ON_GOAL";
                     esac;
 
                 board[1][1] = "KEEPER":
                     case
-                        board[2][1] = "FLOOR" & next(action) = d : "FLOOR";
-                        board[0][1] = "FLOOR" & next(action) = u : "FLOOR";
-                        board[1][2] = "FLOOR" & next(action) = r : "FLOOR";
-                        board[1][0] = "FLOOR" & next(action) = l : "FLOOR";
-                        board[2][1] = "BOX" & (board[3][1] = "FLOOR" | board[3][1] = "GOAL") & next(action) = d : "FLOOR";
-                        board[0][1] = "BOX" & (board[-1][1] = "FLOOR" | board[-1][1] = "GOAL") & next(action) = u : "FLOOR";
-                        board[1][2] = "BOX" & (board[1][3] = "FLOOR" | board[1][3] = "GOAL") & next(action) = r : "FLOOR";
-                        board[1][0] = "BOX" & (board[1][-1] = "FLOOR" | board[1][-1] = "GOAL") & next(action) = l : "FLOOR";
+                        (board[2][1] = "FLOOR" | board[2][1] = "GOAL") & next(action) = d : "FLOOR";
+                        (board[0][1] = "FLOOR" | board[0][1] = "GOAL") & next(action) = u : "FLOOR";
+                        (board[1][2] = "FLOOR" | board[1][2] = "GOAL") & next(action) = r : "FLOOR";
+                        (board[1][0] = "FLOOR" | board[1][0] = "GOAL") & next(action) = l : "FLOOR";
+                        (board[2][1] = "BOX" | board[2][1] = "BOX_ON_GOAL") & (board[3][1] = "FLOOR" | board[3][1] = "GOAL") & next(action) = d : "FLOOR";
+                        (board[0][1] = "BOX" | board[0][1] = "BOX_ON_GOAL") & (board[-1][1] = "FLOOR" | board[-1][1] = "GOAL") & next(action) = u : "FLOOR";
+                        (board[1][2] = "BOX" | board[1][2] = "BOX_ON_GOAL") & (board[1][3] = "FLOOR" | board[1][3] = "GOAL") & next(action) = r : "FLOOR";
+                        (board[1][0] = "BOX" | board[1][0] = "BOX_ON_GOAL") & (board[1][-1] = "FLOOR" | board[1][-1] = "GOAL") & next(action) = l : "FLOOR";
                         TRUE : "KEEPER";
                     esac;
 
@@ -551,27 +551,27 @@
             case
                 board[1][2] = "KEEPER_ON_GOAL": 
                     case
-                        board[2][2] = "FLOOR" & next(action) = d : "GOAL";
-                        board[0][2] = "FLOOR" & next(action) = u : "GOAL";
-                        board[1][3] = "FLOOR" & next(action) = r : "GOAL";
-                        board[1][1] = "FLOOR" & next(action) = l : "GOAL";
-                        board[2][2] = "BOX" & (board[3][2] = "FLOOR" | board[3][2] = "GOAL") & next(action) = d : "GOAL";
-                        board[0][2] = "BOX" & (board[-1][2] = "FLOOR" | board[-1][2] = "GOAL") & next(action) = u : "GOAL";
-                        board[1][3] = "BOX" & (board[1][4] = "FLOOR" | board[1][4] = "GOAL") & next(action) = r : "GOAL";
-                        board[1][1] = "BOX" & (board[1][0] = "FLOOR" | board[1][0] = "GOAL") & next(action) = l : "GOAL";
+                        (board[2][2] = "FLOOR" | board[2][2] = "GOAL") & next(action) = d : "GOAL";
+                        (board[0][2] = "FLOOR" | board[0][2] = "GOAL") & next(action) = u : "GOAL";
+                        (board[1][3] = "FLOOR" | board[1][3] = "GOAL") & next(action) = r : "GOAL";
+                        (board[1][1] = "FLOOR" | board[1][1] = "GOAL") & next(action) = l : "GOAL";
+                        (board[2][2] = "BOX" | board[2][2] = "BOX_ON_GOAL") & (board[3][2] = "FLOOR" | board[3][2] = "GOAL") & next(action) = d : "GOAL";
+                        (board[0][2] = "BOX" | board[0][2] = "BOX_ON_GOAL") & (board[-1][2] = "FLOOR" | board[-1][2] = "GOAL") & next(action) = u : "GOAL";
+                        (board[1][3] = "BOX" | board[1][3] = "BOX_ON_GOAL") & (board[1][4] = "FLOOR" | board[1][4] = "GOAL") & next(action) = r : "GOAL";
+                        (board[1][1] = "BOX" | board[1][1] = "BOX_ON_GOAL") & (board[1][0] = "FLOOR" | board[1][0] = "GOAL") & next(action) = l : "GOAL";
                         TRUE : "KEEPER_ON_GOAL";
                     esac;
 
                 board[1][2] = "KEEPER":
                     case
-                        board[2][2] = "FLOOR" & next(action) = d : "FLOOR";
-                        board[0][2] = "FLOOR" & next(action) = u : "FLOOR";
-                        board[1][3] = "FLOOR" & next(action) = r : "FLOOR";
-                        board[1][1] = "FLOOR" & next(action) = l : "FLOOR";
-                        board[2][2] = "BOX" & (board[3][2] = "FLOOR" | board[3][2] = "GOAL") & next(action) = d : "FLOOR";
-                        board[0][2] = "BOX" & (board[-1][2] = "FLOOR" | board[-1][2] = "GOAL") & next(action) = u : "FLOOR";
-                        board[1][3] = "BOX" & (board[1][4] = "FLOOR" | board[1][4] = "GOAL") & next(action) = r : "FLOOR";
-                        board[1][1] = "BOX" & (board[1][0] = "FLOOR" | board[1][0] = "GOAL") & next(action) = l : "FLOOR";
+                        (board[2][2] = "FLOOR" | board[2][2] = "GOAL") & next(action) = d : "FLOOR";
+                        (board[0][2] = "FLOOR" | board[0][2] = "GOAL") & next(action) = u : "FLOOR";
+                        (board[1][3] = "FLOOR" | board[1][3] = "GOAL") & next(action) = r : "FLOOR";
+                        (board[1][1] = "FLOOR" | board[1][1] = "GOAL") & next(action) = l : "FLOOR";
+                        (board[2][2] = "BOX" | board[2][2] = "BOX_ON_GOAL") & (board[3][2] = "FLOOR" | board[3][2] = "GOAL") & next(action) = d : "FLOOR";
+                        (board[0][2] = "BOX" | board[0][2] = "BOX_ON_GOAL") & (board[-1][2] = "FLOOR" | board[-1][2] = "GOAL") & next(action) = u : "FLOOR";
+                        (board[1][3] = "BOX" | board[1][3] = "BOX_ON_GOAL") & (board[1][4] = "FLOOR" | board[1][4] = "GOAL") & next(action) = r : "FLOOR";
+                        (board[1][1] = "BOX" | board[1][1] = "BOX_ON_GOAL") & (board[1][0] = "FLOOR" | board[1][0] = "GOAL") & next(action) = l : "FLOOR";
                         TRUE : "KEEPER";
                     esac;
 
@@ -636,27 +636,27 @@
             case
                 board[2][0] = "KEEPER_ON_GOAL": 
                     case
-                        board[3][0] = "FLOOR" & next(action) = d : "GOAL";
-                        board[1][0] = "FLOOR" & next(action) = u : "GOAL";
-                        board[2][1] = "FLOOR" & next(action) = r : "GOAL";
-                        board[2][-1] = "FLOOR" & next(action) = l : "GOAL";
-                        board[3][0] = "BOX" & (board[4][0] = "FLOOR" | board[4][0] = "GOAL") & next(action) = d : "GOAL";
-                        board[1][0] = "BOX" & (board[0][0] = "FLOOR" | board[0][0] = "GOAL") & next(action) = u : "GOAL";
-                        board[2][1] = "BOX" & (board[2][2] = "FLOOR" | board[2][2] = "GOAL") & next(action) = r : "GOAL";
-                        board[2][-1] = "BOX" & (board[2][-2] = "FLOOR" | board[2][-2] = "GOAL") & next(action) = l : "GOAL";
+                        (board[3][0] = "FLOOR" | board[3][0] = "GOAL") & next(action) = d : "GOAL";
+                        (board[1][0] = "FLOOR" | board[1][0] = "GOAL") & next(action) = u : "GOAL";
+                        (board[2][1] = "FLOOR" | board[2][1] = "GOAL") & next(action) = r : "GOAL";
+                        (board[2][-1] = "FLOOR" | board[2][-1] = "GOAL") & next(action) = l : "GOAL";
+                        (board[3][0] = "BOX" | board[3][0] = "BOX_ON_GOAL") & (board[4][0] = "FLOOR" | board[4][0] = "GOAL") & next(action) = d : "GOAL";
+                        (board[1][0] = "BOX" | board[1][0] = "BOX_ON_GOAL") & (board[0][0] = "FLOOR" | board[0][0] = "GOAL") & next(action) = u : "GOAL";
+                        (board[2][1] = "BOX" | board[2][1] = "BOX_ON_GOAL") & (board[2][2] = "FLOOR" | board[2][2] = "GOAL") & next(action) = r : "GOAL";
+                        (board[2][-1] = "BOX" | board[2][-1] = "BOX_ON_GOAL") & (board[2][-2] = "FLOOR" | board[2][-2] = "GOAL") & next(action) = l : "GOAL";
                         TRUE : "KEEPER_ON_GOAL";
                     esac;
 
                 board[2][0] = "KEEPER":
                     case
-                        board[3][0] = "FLOOR" & next(action) = d : "FLOOR";
-                        board[1][0] = "FLOOR" & next(action) = u : "FLOOR";
-                        board[2][1] = "FLOOR" & next(action) = r : "FLOOR";
-                        board[2][-1] = "FLOOR" & next(action) = l : "FLOOR";
-                        board[3][0] = "BOX" & (board[4][0] = "FLOOR" | board[4][0] = "GOAL") & next(action) = d : "FLOOR";
-                        board[1][0] = "BOX" & (board[0][0] = "FLOOR" | board[0][0] = "GOAL") & next(action) = u : "FLOOR";
-                        board[2][1] = "BOX" & (board[2][2] = "FLOOR" | board[2][2] = "GOAL") & next(action) = r : "FLOOR";
-                        board[2][-1] = "BOX" & (board[2][-2] = "FLOOR" | board[2][-2] = "GOAL") & next(action) = l : "FLOOR";
+                        (board[3][0] = "FLOOR" | board[3][0] = "GOAL") & next(action) = d : "FLOOR";
+                        (board[1][0] = "FLOOR" | board[1][0] = "GOAL") & next(action) = u : "FLOOR";
+                        (board[2][1] = "FLOOR" | board[2][1] = "GOAL") & next(action) = r : "FLOOR";
+                        (board[2][-1] = "FLOOR" | board[2][-1] = "GOAL") & next(action) = l : "FLOOR";
+                        (board[3][0] = "BOX" | board[3][0] = "BOX_ON_GOAL") & (board[4][0] = "FLOOR" | board[4][0] = "GOAL") & next(action) = d : "FLOOR";
+                        (board[1][0] = "BOX" | board[1][0] = "BOX_ON_GOAL") & (board[0][0] = "FLOOR" | board[0][0] = "GOAL") & next(action) = u : "FLOOR";
+                        (board[2][1] = "BOX" | board[2][1] = "BOX_ON_GOAL") & (board[2][2] = "FLOOR" | board[2][2] = "GOAL") & next(action) = r : "FLOOR";
+                        (board[2][-1] = "BOX" | board[2][-1] = "BOX_ON_GOAL") & (board[2][-2] = "FLOOR" | board[2][-2] = "GOAL") & next(action) = l : "FLOOR";
                         TRUE : "KEEPER";
                     esac;
 
@@ -713,27 +713,27 @@
             case
                 board[2][1] = "KEEPER_ON_GOAL": 
                     case
-                        board[3][1] = "FLOOR" & next(action) = d : "GOAL";
-                        board[1][1] = "FLOOR" & next(action) = u : "GOAL";
-                        board[2][2] = "FLOOR" & next(action) = r : "GOAL";
-                        board[2][0] = "FLOOR" & next(action) = l : "GOAL";
-                        board[3][1] = "BOX" & (board[4][1] = "FLOOR" | board[4][1] = "GOAL") & next(action) = d : "GOAL";
-                        board[1][1] = "BOX" & (board[0][1] = "FLOOR" | board[0][1] = "GOAL") & next(action) = u : "GOAL";
-                        board[2][2] = "BOX" & (board[2][3] = "FLOOR" | board[2][3] = "GOAL") & next(action) = r : "GOAL";
-                        board[2][0] = "BOX" & (board[2][-1] = "FLOOR" | board[2][-1] = "GOAL") & next(action) = l : "GOAL";
+                        (board[3][1] = "FLOOR" | board[3][1] = "GOAL") & next(action) = d : "GOAL";
+                        (board[1][1] = "FLOOR" | board[1][1] = "GOAL") & next(action) = u : "GOAL";
+                        (board[2][2] = "FLOOR" | board[2][2] = "GOAL") & next(action) = r : "GOAL";
+                        (board[2][0] = "FLOOR" | board[2][0] = "GOAL") & next(action) = l : "GOAL";
+                        (board[3][1] = "BOX" | board[3][1] = "BOX_ON_GOAL") & (board[4][1] = "FLOOR" | board[4][1] = "GOAL") & next(action) = d : "GOAL";
+                        (board[1][1] = "BOX" | board[1][1] = "BOX_ON_GOAL") & (board[0][1] = "FLOOR" | board[0][1] = "GOAL") & next(action) = u : "GOAL";
+                        (board[2][2] = "BOX" | board[2][2] = "BOX_ON_GOAL") & (board[2][3] = "FLOOR" | board[2][3] = "GOAL") & next(action) = r : "GOAL";
+                        (board[2][0] = "BOX" | board[2][0] = "BOX_ON_GOAL") & (board[2][-1] = "FLOOR" | board[2][-1] = "GOAL") & next(action) = l : "GOAL";
                         TRUE : "KEEPER_ON_GOAL";
                     esac;
 
                 board[2][1] = "KEEPER":
                     case
-                        board[3][1] = "FLOOR" & next(action) = d : "FLOOR";
-                        board[1][1] = "FLOOR" & next(action) = u : "FLOOR";
-                        board[2][2] = "FLOOR" & next(action) = r : "FLOOR";
-                        board[2][0] = "FLOOR" & next(action) = l : "FLOOR";
-                        board[3][1] = "BOX" & (board[4][1] = "FLOOR" | board[4][1] = "GOAL") & next(action) = d : "FLOOR";
-                        board[1][1] = "BOX" & (board[0][1] = "FLOOR" | board[0][1] = "GOAL") & next(action) = u : "FLOOR";
-                        board[2][2] = "BOX" & (board[2][3] = "FLOOR" | board[2][3] = "GOAL") & next(action) = r : "FLOOR";
-                        board[2][0] = "BOX" & (board[2][-1] = "FLOOR" | board[2][-1] = "GOAL") & next(action) = l : "FLOOR";
+                        (board[3][1] = "FLOOR" | board[3][1] = "GOAL") & next(action) = d : "FLOOR";
+                        (board[1][1] = "FLOOR" | board[1][1] = "GOAL") & next(action) = u : "FLOOR";
+                        (board[2][2] = "FLOOR" | board[2][2] = "GOAL") & next(action) = r : "FLOOR";
+                        (board[2][0] = "FLOOR" | board[2][0] = "GOAL") & next(action) = l : "FLOOR";
+                        (board[3][1] = "BOX" | board[3][1] = "BOX_ON_GOAL") & (board[4][1] = "FLOOR" | board[4][1] = "GOAL") & next(action) = d : "FLOOR";
+                        (board[1][1] = "BOX" | board[1][1] = "BOX_ON_GOAL") & (board[0][1] = "FLOOR" | board[0][1] = "GOAL") & next(action) = u : "FLOOR";
+                        (board[2][2] = "BOX" | board[2][2] = "BOX_ON_GOAL") & (board[2][3] = "FLOOR" | board[2][3] = "GOAL") & next(action) = r : "FLOOR";
+                        (board[2][0] = "BOX" | board[2][0] = "BOX_ON_GOAL") & (board[2][-1] = "FLOOR" | board[2][-1] = "GOAL") & next(action) = l : "FLOOR";
                         TRUE : "KEEPER";
                     esac;
 
@@ -790,27 +790,27 @@
             case
                 board[2][2] = "KEEPER_ON_GOAL": 
                     case
-                        board[3][2] = "FLOOR" & next(action) = d : "GOAL";
-                        board[1][2] = "FLOOR" & next(action) = u : "GOAL";
-                        board[2][3] = "FLOOR" & next(action) = r : "GOAL";
-                        board[2][1] = "FLOOR" & next(action) = l : "GOAL";
-                        board[3][2] = "BOX" & (board[4][2] = "FLOOR" | board[4][2] = "GOAL") & next(action) = d : "GOAL";
-                        board[1][2] = "BOX" & (board[0][2] = "FLOOR" | board[0][2] = "GOAL") & next(action) = u : "GOAL";
-                        board[2][3] = "BOX" & (board[2][4] = "FLOOR" | board[2][4] = "GOAL") & next(action) = r : "GOAL";
-                        board[2][1] = "BOX" & (board[2][0] = "FLOOR" | board[2][0] = "GOAL") & next(action) = l : "GOAL";
+                        (board[3][2] = "FLOOR" | board[3][2] = "GOAL") & next(action) = d : "GOAL";
+                        (board[1][2] = "FLOOR" | board[1][2] = "GOAL") & next(action) = u : "GOAL";
+                        (board[2][3] = "FLOOR" | board[2][3] = "GOAL") & next(action) = r : "GOAL";
+                        (board[2][1] = "FLOOR" | board[2][1] = "GOAL") & next(action) = l : "GOAL";
+                        (board[3][2] = "BOX" | board[3][2] = "BOX_ON_GOAL") & (board[4][2] = "FLOOR" | board[4][2] = "GOAL") & next(action) = d : "GOAL";
+                        (board[1][2] = "BOX" | board[1][2] = "BOX_ON_GOAL") & (board[0][2] = "FLOOR" | board[0][2] = "GOAL") & next(action) = u : "GOAL";
+                        (board[2][3] = "BOX" | board[2][3] = "BOX_ON_GOAL") & (board[2][4] = "FLOOR" | board[2][4] = "GOAL") & next(action) = r : "GOAL";
+                        (board[2][1] = "BOX" | board[2][1] = "BOX_ON_GOAL") & (board[2][0] = "FLOOR" | board[2][0] = "GOAL") & next(action) = l : "GOAL";
                         TRUE : "KEEPER_ON_GOAL";
                     esac;
 
                 board[2][2] = "KEEPER":
                     case
-                        board[3][2] = "FLOOR" & next(action) = d : "FLOOR";
-                        board[1][2] = "FLOOR" & next(action) = u : "FLOOR";
-                        board[2][3] = "FLOOR" & next(action) = r : "FLOOR";
-                        board[2][1] = "FLOOR" & next(action) = l : "FLOOR";
-                        board[3][2] = "BOX" & (board[4][2] = "FLOOR" | board[4][2] = "GOAL") & next(action) = d : "FLOOR";
-                        board[1][2] = "BOX" & (board[0][2] = "FLOOR" | board[0][2] = "GOAL") & next(action) = u : "FLOOR";
-                        board[2][3] = "BOX" & (board[2][4] = "FLOOR" | board[2][4] = "GOAL") & next(action) = r : "FLOOR";
-                        board[2][1] = "BOX" & (board[2][0] = "FLOOR" | board[2][0] = "GOAL") & next(action) = l : "FLOOR";
+                        (board[3][2] = "FLOOR" | board[3][2] = "GOAL") & next(action) = d : "FLOOR";
+                        (board[1][2] = "FLOOR" | board[1][2] = "GOAL") & next(action) = u : "FLOOR";
+                        (board[2][3] = "FLOOR" | board[2][3] = "GOAL") & next(action) = r : "FLOOR";
+                        (board[2][1] = "FLOOR" | board[2][1] = "GOAL") & next(action) = l : "FLOOR";
+                        (board[3][2] = "BOX" | board[3][2] = "BOX_ON_GOAL") & (board[4][2] = "FLOOR" | board[4][2] = "GOAL") & next(action) = d : "FLOOR";
+                        (board[1][2] = "BOX" | board[1][2] = "BOX_ON_GOAL") & (board[0][2] = "FLOOR" | board[0][2] = "GOAL") & next(action) = u : "FLOOR";
+                        (board[2][3] = "BOX" | board[2][3] = "BOX_ON_GOAL") & (board[2][4] = "FLOOR" | board[2][4] = "GOAL") & next(action) = r : "FLOOR";
+                        (board[2][1] = "BOX" | board[2][1] = "BOX_ON_GOAL") & (board[2][0] = "FLOOR" | board[2][0] = "GOAL") & next(action) = l : "FLOOR";
                         TRUE : "KEEPER";
                     esac;
 

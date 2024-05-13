@@ -29,12 +29,17 @@ if __name__ == "__main__":
 
     # Part 2
     start_time = time.time()
-    generate_smv_file("board4.txt")
+    generate_smv_file("board2.txt")
     execution_time = run_nuXmv("commands_list.sh", "moves.txt")
     generate_actions_file()
     print("NuXmv Execution Time:", execution_time, "seconds")
 
+    # print moves
+    with open("moves.txt", 'r') as f:
+        print(f.read())
 
 
-    # Part 3
+
+
+    # # Part 3
     # iterative_solution("board4.txt")

@@ -24,17 +24,9 @@
 *** Copyright (C) 2009-2019 by University of Trento and others
 *** See http://mathsat.fbk.eu
 
--- no counterexample found with bound 0
--- no counterexample found with bound 1
--- no counterexample found with bound 2
--- no counterexample found with bound 3
--- no counterexample found with bound 4
--- no counterexample found with bound 5
--- no counterexample found with bound 6
--- no counterexample found with bound 7
--- specification  G !((board[1][5] = "BOX_ON_GOAL" & board[2][1] = "BOX_ON_GOAL") & board[4][2] = "BOX_ON_GOAL")    is false
+-- specification  G !(((board[1][3] = "BOX_ON_GOAL" & board[3][1] = "BOX_ON_GOAL") & board[3][5] = "BOX_ON_GOAL") & board[5][3] = "BOX_ON_GOAL")  is false
 -- as demonstrated by the following execution sequence
-Trace Description: BMC Counterexample 
+Trace Description: LTL Counterexample 
 Trace Type: Counterexample 
   -> State: 1.1 <-
     board[-2][-2] = "NULL"
@@ -75,31 +67,31 @@ Trace Type: Counterexample
     board[1][0] = "WALL"
     board[1][1] = "WALL"
     board[1][2] = "WALL"
-    board[1][3] = "FLOOR"
-    board[1][4] = "FLOOR"
-    board[1][5] = "GOAL"
+    board[1][3] = "GOAL"
+    board[1][4] = "WALL"
+    board[1][5] = "WALL"
     board[1][6] = "WALL"
     board[1][7] = "NULL"
     board[1][8] = "NULL"
     board[2][-2] = "NULL"
     board[2][-1] = "NULL"
     board[2][0] = "WALL"
-    board[2][1] = "GOAL"
-    board[2][2] = "BOX"
-    board[2][3] = "KEEPER"
-    board[2][4] = "BOX"
-    board[2][5] = "FLOOR"
+    board[2][1] = "WALL"
+    board[2][2] = "WALL"
+    board[2][3] = "BOX"
+    board[2][4] = "WALL"
+    board[2][5] = "WALL"
     board[2][6] = "WALL"
     board[2][7] = "NULL"
     board[2][8] = "NULL"
     board[3][-2] = "NULL"
     board[3][-1] = "NULL"
     board[3][0] = "WALL"
-    board[3][1] = "WALL"
+    board[3][1] = "GOAL"
     board[3][2] = "BOX"
-    board[3][3] = "FLOOR"
-    board[3][4] = "FLOOR"
-    board[3][5] = "FLOOR"
+    board[3][3] = "KEEPER"
+    board[3][4] = "BOX"
+    board[3][5] = "GOAL"
     board[3][6] = "WALL"
     board[3][7] = "NULL"
     board[3][8] = "NULL"
@@ -107,8 +99,8 @@ Trace Type: Counterexample
     board[4][-1] = "NULL"
     board[4][0] = "WALL"
     board[4][1] = "WALL"
-    board[4][2] = "GOAL"
-    board[4][3] = "WALL"
+    board[4][2] = "WALL"
+    board[4][3] = "BOX"
     board[4][4] = "WALL"
     board[4][5] = "WALL"
     board[4][6] = "WALL"
@@ -119,7 +111,7 @@ Trace Type: Counterexample
     board[5][0] = "WALL"
     board[5][1] = "WALL"
     board[5][2] = "WALL"
-    board[5][3] = "WALL"
+    board[5][3] = "GOAL"
     board[5][4] = "WALL"
     board[5][5] = "WALL"
     board[5][6] = "WALL"
@@ -151,36 +143,36 @@ Trace Type: Counterexample
     columns = 7
     rows = 6
   -> State: 1.2 <-
-    board[2][3] = "FLOOR"
-    board[2][4] = "KEEPER"
-    board[2][5] = "BOX"
-    action = r
-  -> State: 1.3 <-
-    board[2][4] = "FLOOR"
-    board[3][4] = "KEEPER"
-    action = d
-  -> State: 1.4 <-
-    board[3][4] = "FLOOR"
-    board[3][5] = "KEEPER"
-    action = r
-  -> State: 1.5 <-
-    board[1][5] = "BOX_ON_GOAL"
-    board[2][5] = "KEEPER"
-    board[3][5] = "FLOOR"
-    action = u
-  -> State: 1.6 <-
-    board[2][4] = "KEEPER"
-    board[2][5] = "FLOOR"
-    action = l
-  -> State: 1.7 <-
-    board[2][3] = "KEEPER"
-    board[2][4] = "FLOOR"
-  -> State: 1.8 <-
-    board[2][1] = "BOX_ON_GOAL"
-    board[2][2] = "KEEPER"
-    board[2][3] = "FLOOR"
-  -> State: 1.9 <-
-    board[2][2] = "FLOOR"
+    board[3][1] = "BOX_ON_GOAL"
     board[3][2] = "KEEPER"
-    board[4][2] = "BOX_ON_GOAL"
+    board[3][3] = "FLOOR"
+    action = l
+  -> State: 1.3 <-
+    board[3][2] = "FLOOR"
+    board[3][3] = "KEEPER"
+    action = r
+  -> State: 1.4 <-
+    board[3][3] = "FLOOR"
+    board[3][4] = "KEEPER"
+    board[3][5] = "BOX_ON_GOAL"
+  -> State: 1.5 <-
+    board[3][3] = "KEEPER"
+    board[3][4] = "FLOOR"
+    action = l
+  -> State: 1.6 <-
+    board[1][3] = "BOX_ON_GOAL"
+    board[2][3] = "KEEPER"
+    board[3][3] = "FLOOR"
+    action = u
+  -> State: 1.7 <-
+    board[2][3] = "FLOOR"
+    board[3][3] = "KEEPER"
     action = d
+  -- Loop starts here
+  -> State: 1.8 <-
+    board[3][3] = "FLOOR"
+    board[4][3] = "KEEPER"
+    board[5][3] = "BOX_ON_GOAL"
+  -- Loop starts here
+  -> State: 1.9 <-
+  -> State: 1.10 <-
