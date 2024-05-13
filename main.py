@@ -34,12 +34,5 @@ if __name__ == "__main__":
     generate_actions_file()
     print("NuXmv Execution Time:", execution_time, "seconds")
 
-    # print moves
-    with open("moves.txt", 'r') as f:
-        print(f.read())
-
-
-
-
     # # Part 3
     # iterative_solution("board4.txt")
